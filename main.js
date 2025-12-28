@@ -1,12 +1,17 @@
 
         document.addEventListener('DOMContentLoaded', function() {
+            // Initialize projects
+            const projectContainer = document.getElementById('projectCardsContainer');
+            let currentLang = localStorage.getItem('preferredLanguage') || 'en';
+            
+            // Render projects on page load
+            if (typeof projectsData !== 'undefined' && projectContainer) {
+                renderProjects(projectsData, currentLang, projectContainer);
+            }
+            
             // Mobile navigation toggle
             const hamburger = document.getElementById('hamburger');
             const navLinks = document.getElementById('navLinks');
-            
-            // Debug helper
-            console.log('Hamburger element:', hamburger);
-            console.log('Nav links element:', navLinks);
             
             if (hamburger && navLinks) {
                 hamburger.addEventListener('click', function(e) {
@@ -74,7 +79,9 @@
             // Language Switcher Functionality
             const langToggle = document.getElementById('langToggle');
             const langText = langToggle.querySelector('.lang-text');
-            let currentLang = 'en';
+            
+            // Update button text based on current language
+            langText.textContent = currentLang.toUpperCase();
 
             langToggle.addEventListener('click', function() {
                 // Toggle language
@@ -83,7 +90,19 @@
                 // Update button text
                 langText.textContent = currentLang.toUpperCase();
                 
-                // Show/hide elements based on language
+                // Re-render projects with new language
+                if (typeof projectsData !== 'undefined' && projectContainer) {
+                    renderProjects(projectsData, currentLang, projectContainer);
+                    
+                    // Re-setup lightbox handlers after re-render
+                    setTimeout(() => {
+                        if (typeof setupLightboxHandlers === 'function') {
+                            setupLightboxHandlers();
+                        }
+                    }, 100);
+                }
+                
+                // Show/hide static elements based on language
                 document.querySelectorAll('.lang-en').forEach(el => {
                     el.style.display = currentLang === 'en' ? '' : 'none';
                 });
@@ -136,22 +155,32 @@
                 localStorage.setItem('preferredLanguage', currentLang);
             });
 
-            // Check for saved language preference
-            const savedLang = localStorage.getItem('preferredLanguage');
-            if (savedLang && savedLang !== 'en') {
-                // Trigger language switch if saved preference is not English
-                langToggle.click();
+            // Check for saved language preference and apply it
+            if (currentLang !== 'en') {
+                // Apply saved language preference
+                langText.textContent = currentLang.toUpperCase();
+                document.querySelectorAll('.lang-en').forEach(el => {
+                    el.style.display = 'none';
+                });
+                document.querySelectorAll('.lang-ru').forEach(el => {
+                    el.style.display = '';
+                });
             }
 
             // Simple search with visual feedback
-            const projectCards = document.querySelectorAll('.project-card');
+            let projectCards = document.querySelectorAll('.project-card');
             const searchInputEn = document.getElementById('projectSearch');
             const searchInputRu = document.getElementById('projectSearchRu');
             const clearButton = document.getElementById('clearSearch');
             const searchInfo = document.getElementById('searchInfo');
             const noResultsElement = document.getElementById('noResults');
             
-            let currentSearchInput = searchInputEn;
+            let currentSearchInput = currentLang === 'en' ? searchInputEn : searchInputRu;
+            
+            // Function to refresh project cards reference
+            function refreshProjectCards() {
+                projectCards = document.querySelectorAll('.project-card');
+            }
 
             // Function to highlight matching text
             function highlightText(element, searchTerm) {
@@ -200,6 +229,7 @@
 
             // Main search function
             function performSearch() {
+                refreshProjectCards(); // Refresh reference to project cards
                 const searchTerm = currentSearchInput.value.toLowerCase().trim();
                 let visibleCount = 0;
                 const totalCount = projectCards.length;
@@ -208,7 +238,9 @@
                 removeHighlights();
 
                 // Show/hide clear button
-                clearButton.style.display = searchTerm ? 'flex' : 'none';
+                if (clearButton) {
+                    clearButton.style.display = searchTerm ? 'flex' : 'none';
+                }
 
                 projectCards.forEach(card => {
                     let matches = false;
@@ -217,8 +249,8 @@
                         matches = true;
                     } else {
                         // Get visible elements based on current language
-                        const titleElement = card.querySelector(`.project-title.lang-${currentLang}:not([style*="display: none"]), .project-title:not(.lang-en):not(.lang-ru)`);
-                        const descriptionElement = card.querySelector(`.project-description.lang-${currentLang}:not([style*="display: none"]), .project-description:not(.lang-en):not(.lang-ru)`);
+                        const titleElement = card.querySelector(`.project-title.lang-${currentLang}`);
+                        const descriptionElement = card.querySelector(`.project-description.lang-${currentLang}`);
                         const techElements = card.querySelectorAll('.tech-tag');
 
                         // Check matches
@@ -256,13 +288,17 @@
                 });
 
                 // Update search info
-                updateSearchInfo(searchTerm, visibleCount, totalCount);
+                if (searchInfo) {
+                    updateSearchInfo(searchTerm, visibleCount, totalCount);
+                }
 
                 // Show/hide no results message
-                if (visibleCount === 0 && searchTerm !== '') {
-                    noResultsElement.style.display = 'block';
-                } else {
-                    noResultsElement.style.display = 'none';
+                if (noResultsElement) {
+                    if (visibleCount === 0 && searchTerm !== '') {
+                        noResultsElement.style.display = 'block';
+                    } else {
+                        noResultsElement.style.display = 'none';
+                    }
                 }
             }
 
@@ -297,8 +333,13 @@
             setupSearchInput(searchInputEn);
             setupSearchInput(searchInputRu);
 
-            // Initial load
-            updateSearchInfo('', projectCards.length, projectCards.length);
+            // Initial load - wait for projects to be rendered
+            setTimeout(() => {
+                refreshProjectCards();
+                if (searchInfo) {
+                    updateSearchInfo('', projectCards.length, projectCards.length);
+                }
+            }, 100);
 
             // === ANALYTICS SYSTEM ===
             
@@ -393,11 +434,14 @@
                 console.log('📊 Analytics:', eventType, eventData);
             }
 
-            // Track page load
-            trackEvent('page_load', {
-                totalProjects: projectCards.length,
-                loadTimeMs: performance.now()
-            });
+            // Track page load - wait for projects to be rendered
+            setTimeout(() => {
+                refreshProjectCards();
+                trackEvent('page_load', {
+                    totalProjects: projectCards.length,
+                    loadTimeMs: performance.now()
+                });
+            }, 100);
 
             // Track language switches
             langToggle.addEventListener('click', function(e) {
@@ -496,37 +540,46 @@
                 }
             });
 
-            // Track project views and clicks
-            projectCards.forEach((card, index) => {
-                const projectTitle = card.querySelector('.project-title').textContent.trim();
-                
-                // Track when project comes into view
-                const observer = new IntersectionObserver((entries) => {
-                    entries.forEach(entry => {
-                        if (entry.isIntersecting) {
-                            trackEvent('project_view', {
+            // Track project views and clicks - setup after projects are rendered
+            function setupProjectTracking() {
+                refreshProjectCards();
+                projectCards.forEach((card, index) => {
+                    const titleElement = card.querySelector(`.project-title.lang-${currentLang}`);
+                    if (!titleElement) return;
+                    
+                    const projectTitle = titleElement.textContent.trim();
+                    
+                    // Track when project comes into view
+                    const observer = new IntersectionObserver((entries) => {
+                        entries.forEach(entry => {
+                            if (entry.isIntersecting) {
+                                trackEvent('project_view', {
+                                    projectTitle: projectTitle,
+                                    projectIndex: index + 1,
+                                    language: currentLang
+                                });
+                                observer.unobserve(entry.target);
+                            }
+                        });
+                    }, { threshold: 0.6 });
+                    
+                    observer.observe(card);
+
+                    // Track project card clicks (not links)
+                    card.addEventListener('click', function(e) {
+                        if (!e.target.closest('a')) {
+                            trackEvent('project_click', {
                                 projectTitle: projectTitle,
                                 projectIndex: index + 1,
                                 language: currentLang
                             });
-                            observer.unobserve(entry.target);
                         }
                     });
-                }, { threshold: 0.6 });
-                
-                observer.observe(card);
-
-                // Track project card clicks (not links)
-                card.addEventListener('click', function(e) {
-                    if (!e.target.closest('a')) {
-                        trackEvent('project_click', {
-                            projectTitle: projectTitle,
-                            projectIndex: index + 1,
-                            language: currentLang
-                        });
-                    }
                 });
-            });
+            }
+            
+            // Setup tracking after initial render
+            setTimeout(setupProjectTracking, 100);
 
             // Track CV iframe views
             const cvIframes = document.querySelectorAll('.cv-container iframe');
@@ -611,25 +664,37 @@
                     
                     setTimeout(() => {
                         lightbox.style.display = 'none';
-                        lightboxImage.src = '';
+                        lightboxImage.src = '#';
+                        lightboxImage.style.display = 'none';
                     }, 300);
 
                     trackEvent('image_lightbox_close');
                 }
 
-                // Add click handlers to all project images (desktop only)
-                document.querySelectorAll('.project-media img').forEach(img => {
-                    img.addEventListener('click', function(e) {
-                        e.stopPropagation();
+                // Function to setup lightbox for project images
+                function setupLightboxHandlers() {
+                    document.querySelectorAll('.project-media img').forEach(img => {
+                        // Remove existing listeners to avoid duplicates
+                        const newImg = img.cloneNode(true);
+                        img.parentNode.replaceChild(newImg, img);
                         
-                        // Get project title from the same card
-                        const projectCard = this.closest('.project-card');
-                        const titleElement = projectCard.querySelector(`.project-title.lang-${currentLang}:not([style*="display: none"]), .project-title:not(.lang-en):not(.lang-ru)`);
-                        const projectTitle = titleElement ? titleElement.textContent.trim() : '';
-                        
-                        openLightbox(this.src, this.alt, projectTitle);
+                        newImg.addEventListener('click', function(e) {
+                            e.stopPropagation();
+                            
+                            // Get project title from the same card
+                            const projectCard = this.closest('.project-card');
+                            const titleElement = projectCard.querySelector(`.project-title.lang-${currentLang}`);
+                            const projectTitle = titleElement ? titleElement.textContent.trim() : '';
+                            
+                            openLightbox(this.src, this.alt, projectTitle);
+                        });
                     });
-                });
+                }
+                
+                // Setup lightbox handlers after projects are rendered
+                setTimeout(setupLightboxHandlers, 100);
+                
+                // Re-setup when language changes - handled in language toggle
 
                 // Close lightbox when clicking close button
                 lightboxClose.addEventListener('click', function(e) {
