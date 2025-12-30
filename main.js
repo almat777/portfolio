@@ -4,6 +4,9 @@
             const projectContainer = document.getElementById('projectCardsContainer');
             let currentLang = localStorage.getItem('preferredLanguage') || 'en';
             
+            // Global reference to setupLightboxHandlers (will be set later)
+            let setupLightboxHandlers = null;
+            
             // Render projects on page load
             if (typeof projectsData !== 'undefined' && projectContainer) {
                 renderProjects(projectsData, currentLang, projectContainer);
@@ -96,7 +99,7 @@
                     
                     // Re-setup lightbox handlers after re-render
                     setTimeout(() => {
-                        if (typeof setupLightboxHandlers === 'function') {
+                        if (setupLightboxHandlers !== null && typeof setupLightboxHandlers === 'function') {
                             setupLightboxHandlers();
                         }
                     }, 100);
@@ -636,12 +639,57 @@
                 const lightboxImage = document.getElementById('lightboxImage');
                 const lightboxTitle = document.getElementById('lightboxTitle');
                 const lightboxClose = document.getElementById('lightboxClose');
+                const lightboxPrev = document.getElementById('lightboxPrev');
+                const lightboxNext = document.getElementById('lightboxNext');
+                const lightboxCounter = document.getElementById('lightboxCounter');
+
+                // Variables to track current lightbox state
+                let currentImages = [];
+                let currentIndex = 0;
+                let currentProjectTitle = '';
+
+                // Function to update lightbox image
+                function updateLightboxImage(index) {
+                    if (index < 0 || index >= currentImages.length) return;
+                    
+                    currentIndex = index;
+                    const imageData = currentImages[index];
+                    
+                    lightboxImage.src = imageData.src;
+                    lightboxImage.alt = imageData.alt;
+                    lightboxImage.style.display = 'block';
+                    
+                    // Update counter if multiple images
+                    if (currentImages.length > 1) {
+                        lightboxCounter.textContent = `${currentIndex + 1} / ${currentImages.length}`;
+                        lightboxCounter.style.display = 'block';
+                        
+                        // Show/hide navigation buttons
+                        lightboxPrev.style.display = currentIndex > 0 ? 'flex' : 'none';
+                        lightboxNext.style.display = currentIndex < currentImages.length - 1 ? 'flex' : 'none';
+                    } else {
+                        lightboxCounter.style.display = 'none';
+                        lightboxPrev.style.display = 'none';
+                        lightboxNext.style.display = 'none';
+                    }
+
+                    // Track lightbox view
+                    trackEvent('image_lightbox_view', {
+                        imageName: imageData.src.split('/').pop(),
+                        imageIndex: currentIndex + 1,
+                        totalImages: currentImages.length,
+                        projectTitle: currentProjectTitle,
+                        language: currentLang
+                    });
+                }
 
                 // Function to open lightbox
-                function openLightbox(imageSrc, imageAlt, projectTitle) {
-                    lightboxImage.src = imageSrc;
-                    lightboxImage.alt = imageAlt;
-                    lightboxTitle.textContent = projectTitle || imageAlt;
+                function openLightbox(images, startIndex, projectTitle) {
+                    currentImages = images;
+                    currentIndex = startIndex;
+                    currentProjectTitle = projectTitle;
+                    
+                    lightboxTitle.textContent = projectTitle;
                     
                     // Prevent body scroll
                     document.body.style.overflow = 'hidden';
@@ -650,12 +698,13 @@
                     lightbox.style.display = 'flex';
                     requestAnimationFrame(() => {
                         lightbox.classList.add('active');
+                        updateLightboxImage(currentIndex);
                     });
 
-                    // Track lightbox view
+                    // Track lightbox open
                     trackEvent('image_lightbox_open', {
-                        imageName: imageSrc.split('/').pop(),
-                        projectTitle: projectTitle || imageAlt,
+                        projectTitle: projectTitle,
+                        totalImages: images.length,
                         language: currentLang
                     });
                 }
@@ -669,30 +718,58 @@
                         lightbox.style.display = 'none';
                         lightboxImage.src = '#';
                         lightboxImage.style.display = 'none';
+                        lightboxCounter.style.display = 'none';
+                        lightboxPrev.style.display = 'none';
+                        lightboxNext.style.display = 'none';
+                        currentImages = [];
+                        currentIndex = 0;
                     }, 300);
 
                     trackEvent('image_lightbox_close');
                 }
 
+                // Navigation functions
+                function showPreviousImage() {
+                    if (currentIndex > 0) {
+                        updateLightboxImage(currentIndex - 1);
+                    }
+                }
+
+                function showNextImage() {
+                    if (currentIndex < currentImages.length - 1) {
+                        updateLightboxImage(currentIndex + 1);
+                    }
+                }
+
                 // Function to setup lightbox for project images
-                function setupLightboxHandlers() {
-                    document.querySelectorAll('.project-media img').forEach(img => {
-                        // Remove existing listeners to avoid duplicates
-                        const newImg = img.cloneNode(true);
-                        img.parentNode.replaceChild(newImg, img);
+                setupLightboxHandlers = function() {
+                    document.querySelectorAll('.project-card').forEach(projectCard => {
+                        // Get project title
+                        const titleElement = projectCard.querySelector(`.project-title.lang-${currentLang}`);
+                        const projectTitle = titleElement ? titleElement.textContent.trim() : '';
                         
-                        newImg.addEventListener('click', function(e) {
-                            e.stopPropagation();
+                        // Collect all images from this project
+                        const projectImages = [];
+                        projectCard.querySelectorAll('.project-media img').forEach(img => {
+                            projectImages.push({
+                                src: img.src,
+                                alt: img.alt
+                            });
+                        });
+                        
+                        // Add click handler to each image
+                        projectCard.querySelectorAll('.project-media img').forEach((img, index) => {
+                            // Remove existing listeners to avoid duplicates
+                            const newImg = img.cloneNode(true);
+                            img.parentNode.replaceChild(newImg, img);
                             
-                            // Get project title from the same card
-                            const projectCard = this.closest('.project-card');
-                            const titleElement = projectCard.querySelector(`.project-title.lang-${currentLang}`);
-                            const projectTitle = titleElement ? titleElement.textContent.trim() : '';
-                            
-                            openLightbox(this.src, this.alt, projectTitle);
+                            newImg.addEventListener('click', function(e) {
+                                e.stopPropagation();
+                                openLightbox(projectImages, index, projectTitle);
+                            });
                         });
                     });
-                }
+                };
                 
                 // Setup lightbox handlers after projects are rendered
                 setTimeout(setupLightboxHandlers, 100);
@@ -705,6 +782,18 @@
                     closeLightbox();
                 });
 
+                // Previous image button
+                lightboxPrev.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    showPreviousImage();
+                });
+
+                // Next image button
+                lightboxNext.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    showNextImage();
+                });
+
                 // Close lightbox when clicking outside the image
                 lightbox.addEventListener('click', function(e) {
                     if (e.target === lightbox) {
@@ -712,10 +801,16 @@
                     }
                 });
 
-                // Close lightbox with ESC key
+                // Keyboard navigation
                 document.addEventListener('keydown', function(e) {
-                    if (e.key === 'Escape' && lightbox.classList.contains('active')) {
-                        closeLightbox();
+                    if (lightbox.classList.contains('active')) {
+                        if (e.key === 'Escape') {
+                            closeLightbox();
+                        } else if (e.key === 'ArrowLeft') {
+                            showPreviousImage();
+                        } else if (e.key === 'ArrowRight') {
+                            showNextImage();
+                        }
                     }
                 });
 

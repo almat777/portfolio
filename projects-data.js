@@ -124,5 +124,66 @@ const projectsData = [
             { type: "github", url: "https://github.com/Skyshmallow/Fisherman", textEn: "GitHub", textRu: "GitHub" },
             { type: "youtube", url: "https://youtube.com/shorts/ySeRwMbyQSw?si=3eVpu5sxlmrunGiD", textEn: "YouTube", textRu: "YouTube" }
         ]
+    },
+    {
+        id: 9,
+        titleEn: "AI-Enhanced RAG System with Cross-Platform Extension",
+        titleRu: "AI-Усиленная RAG Система с Кроссплатформенным Расширением",
+        descEn: "Built a comprehensive RAG (Retrieval-Augmented Generation) system integrated into Google AI Studio via browser extension for PC and mobile. Features Qdrant vector database with Google Drive integration, automated data pipeline via Telegram bot, and n8n workflows deployed on custom domain (n8n.arsen.codes) using Cloudflare tunneling. Includes one-click automation script (start.bat) for Docker stack management and intelligent token cleaning algorithm that reduces context by ~70%.",
+        descRu: "Разработал комплексную RAG (Retrieval-Augmented Generation) систему, интегрированную в Google AI Studio через браузерное расширение для ПК и мобильных устройств. Включает векторную базу данных Qdrant с интеграцией Google Drive, автоматизированный конвейер данных через Telegram-бота и n8n воркфлоу, развёрнутые на персональном домене (n8n.arsen.codes) с использованием Cloudflare туннелирования. Содержит скрипт автоматизации в один клик (start.bat) для управления Docker стеком и интеллектуальный алгоритм очистки токенов, сокращающий контекст на ~70%.",
+        media: [
+            { type: "image", src: "media/rag/RAG_extension.png", altEn: "RAG Mode Toggle in Google AI Studio", altRu: "Переключатель RAG режима в Google AI Studio" },
+            { type: "image", src: "media/rag/n8n_look.png", altEn: "n8n Workflow Interface", altRu: "Интерфейс n8n Воркфлоу" },
+            { type: "image", src: "media/rag/docker_n8n.png", altEn: "Docker Stack with n8n", altRu: "Docker Стек с n8n" },
+            { type: "image", src: "media/rag/start_bat.png", altEn: "One-Click Automation Script", altRu: "Скрипт Автоматизации в Один Клик" },
+            { type: "image", src: "media/rag/thought_process.png", altEn: "Token Cleaning Showcase", altRu: "Демонстрация Очистки Токенов" },
+            { type: "image", src: "media/rag/tg_thought_cleaning.png", altEn: "Telegram Bot Command Menu", altRu: "Меню Команд Telegram Бота" }
+        ],
+        tech: ["Browser Extension", "Qdrant", "Google Drive API", "Telegram Bot API", "n8n", "Docker", "Cloudflare Tunnel", "Vector Embeddings", "RAG"],
+        links: []
+    },
+    {
+        id: 10,
+        titleEn: "WhatsApp, Instagram, Telegram AI Bots",
+        titleRu: "WhatsApp, Instagram, Telegram AI Боты",
+        descEn: "Built three separate AI-powered automation bots for Instagram, Telegram, and WhatsApp that respond to messages from my personal accounts. Each bot is orchestrated through n8n workflows with platform-specific integrations: Instagram uses Meta's official APIs, Telegram uses Bot API, and WhatsApp is powered by Evolution API deployed in Docker. Demonstrates versatility in working with diverse messaging platform APIs and ability to create scalable automation solutions.",
+        descRu: "Создал три отдельных AI-бота для автоматизации Instagram, Telegram и WhatsApp, отвечающих на сообщения от моих личных аккаунтов. Каждый бот управляется через n8n воркфлоу с платформо-специфичными интеграциями: Instagram использует официальные API Meta, Telegram использует Bot API, а WhatsApp работает на Evolution API, развёрнутом в Docker. Демонстрирует универсальность в работе с различными API платформ обмена сообщениями и способность создавать масштабируемые решения автоматизации.",
+        media: [
+            { type: "image", src: "media/instagram.png", altEn: "Instagram AI Bot in Action", altRu: "Instagram AI Бот в Действии" },
+            { type: "image", src: "media/tg_example.jpg", altEn: "Telegram Bot Example", altRu: "Пример Telegram Бота" },
+            { type: "image", src: "media/whatsapp.jpeg", altEn: "WhatsApp Bot Response", altRu: "Ответ WhatsApp Бота" }
+        ],
+        tech: ["Meta API", "Instagram API", "Telegram Bot API", "Evolution API", "WhatsApp", "Docker", "n8n", "AI/LLM Integration", "Workflow Automation"],
+        links: []
+    },
+    {
+        id: 11,
+        titleEn: "Network Monitoring & GIS Platform — KazNetCom",
+        titleRu: "Система Мониторинга Сети и GIS Платформа — KazNetCom",
+        descEn: "During my DevOps internship at KazNetCom, managed a Dockerized Frigate NVR system with NVIDIA CUDA acceleration to optimize server performance. Built a comprehensive monitoring stack using Zabbix & Grafana with custom dashboards for real-time network infrastructure tracking. Integrated Telegram notifications for instant alerts on base station outages. Engineered a custom GIS platform combining OpenStreetMap/Yandex Maps with draw.io editor for interactive network diagram visualization.",
+        descRu: "Во время стажировки DevOps-инженером в KazNetCom управлял Dockerized системой Frigate NVR с аппаратным ускорением NVIDIA CUDA для оптимизации производительности сервера. Создал комплексную систему мониторинга с использованием Zabbix & Grafana с пользовательскими дашбордами для отслеживания сетевой инфраструктуры в реальном времени. Интегрировал уведомления Telegram для мгновенных оповещений о сбоях базовых станций. Разработал кастомную GIS платформу, объединяющую OpenStreetMap/Yandex Maps с редактором draw.io для интерактивной визуализации сетевых диаграмм.",
+        media: [
+            { type: "image", src: "media/knc_freegate.png", altEn: "Frigate NVR System", altRu: "Система Frigate NVR" },
+            { type: "image", src: "media/knc_map_uiux.png", altEn: "Custom GIS Platform UI/UX", altRu: "UI/UX Кастомной GIS Платформы" },
+            { type: "image", src: "media/knc_map_inside_mufta.png", altEn: "Interactive Network Diagram Visualization", altRu: "Интерактивная Визуализация Сетевых Диаграмм" },
+            { type: "image", src: "media/knc_tgbot.png", altEn: "Telegram Notification Bot", altRu: "Бот Уведомлений в Telegram" }
+        ],
+        tech: ["Docker", "Frigate NVR", "NVIDIA CUDA", "Zabbix", "Grafana", "Telegram API", "OpenStreetMap", "Yandex Maps", "draw.io", "Linux", "DevOps"],
+        links: []
+    },
+    {
+        id: 12,
+        titleEn: "Enterprise AI Assistant & Data Pipeline — FinReg Agency",
+        titleRu: "Корпоративный AI Ассистент и Конвейер Данных — FinReg",
+        descEn: "Designed and implemented two end-to-end systems on the n8n platform during internship at Financial Regulatory Agency. Built a sophisticated RAG system for an AI assistant including full data pipeline: web scraping, text vectorization (embeddings), and storage/retrieval from PostgreSQL with PGVector extension. Developed automated report generation system integrating GLPI and Bitrix24 through reverse-engineered APIs and LLM-powered data extraction from .docx files (Ollama). Architected fault-tolerant asynchronous workflows using distributed locking mechanism in PostgreSQL to resolve race conditions. Implemented a PULL-based data retrieval model to bypass network security restrictions.",
+        descRu: "Разработал и внедрил две комплексные системы на платформе n8n во время стажировки в Агентстве финансового регулирования. Создал продвинутую RAG систему для AI ассистента, включая полный конвейер данных: веб-скрейпинг, векторизацию текста (embeddings) и хранение/извлечение из PostgreSQL с расширением PGVector. Разработал систему автоматической генерации отчётов с интеграцией GLPI и Bitrix24 через реверс-инжиниринг API и извлечением структурированных данных из .docx файлов с помощью LLM (Ollama). Спроектировал отказоустойчивые асинхронные воркфлоу, используя механизм распределённых блокировок в PostgreSQL для решения состояний гонки. Реализовал PULL-модель получения данных для обхода ограничений сетевой безопасности.",
+        media: [
+            { type: "image", src: "media/agency_finduser.png", altEn: "AI Assistant User Search Interface", altRu: "Интерфейс Поиска Пользователей AI Ассистента" },
+            { type: "image", src: "media/agency_finduser_result.png", altEn: "AI Assistant Search Results", altRu: "Результаты Поиска AI Ассистента" },
+            { type: "image", src: "media/agency_glpi_ticket.png", altEn: "Automated GLPI Ticket Creation", altRu: "Автоматическое Создание Заявок в GLPI" },
+            { type: "image", src: "media/agency_img_to_text.png", altEn: "LLM-Powered Data Extraction", altRu: "Извлечение Данных с Помощью LLM" }
+        ],
+        tech: ["n8n", "PostgreSQL", "PGVector", "RAG", "Web Scraping", "Embeddings", "GLPI", "Bitrix24", "Ollama", "LLM", "API Reverse Engineering", "Distributed Systems"],
+        links: []
     }
 ];
