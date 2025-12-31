@@ -21,6 +21,79 @@ function generateCarousel(mediaItems, projectId, currentLang) {
         return '<div class="project-media no-media"></div>';
     }
 
+    // Check if all items are audio (special layout for audio comparison)
+    const allAudio = mediaItems.every(item => item.type === 'audio');
+    
+    if (allAudio && mediaItems.length === 2) {
+        // Special layout for 2 audio files (no carousel needed)
+        const audioHTML = mediaItems.map(item => {
+            const label = currentLang === 'en' ? (item.label || 'Audio') : (item.labelRu || item.label || 'Audio');
+            const audioType = item.src.endsWith('.wav') ? 'audio/wav' : 'audio/mpeg';
+            return `
+                <div class="audio-player-wrapper">
+                    <div class="audio-label">${label}</div>
+                    <audio controls preload="metadata">
+                        <source src="${item.src}" type="${audioType}">
+                        Your browser does not support the audio element.
+                    </audio>
+                </div>
+            `;
+        }).join('');
+        
+        return `
+            <div class="project-media audio-comparison">
+                ${audioHTML}
+            </div>
+        `;
+    }
+    
+    if (allAudio && mediaItems.length > 2) {
+        // Create carousel with 2 audio files per page
+        const pages = [];
+        for (let i = 0; i < mediaItems.length; i += 2) {
+            const pageItems = mediaItems.slice(i, i + 2);
+            const audioHTML = pageItems.map(item => {
+                const label = currentLang === 'en' ? (item.label || 'Audio') : (item.labelRu || item.label || 'Audio');
+                const audioType = item.src.endsWith('.wav') ? 'audio/wav' : 'audio/mpeg';
+                return `
+                    <div class="audio-player-wrapper">
+                        <div class="audio-label">${label}</div>
+                        <audio controls preload="metadata">
+                            <source src="${item.src}" type="${audioType}">
+                            Your browser does not support the audio element.
+                        </audio>
+                    </div>
+                `;
+            }).join('');
+            
+            pages.push(`<div class="carousel-item" data-index="${i / 2}">${audioHTML}</div>`);
+        }
+        
+        const carouselItems = pages.join('');
+        const indicators = pages.map((_, index) => 
+            `<button class="carousel-indicator ${index === 0 ? 'active' : ''}" data-index="${index}" aria-label="Go to slide ${index + 1}"></button>`
+        ).join('');
+        
+        return `
+            <div class="project-media">
+                <div class="project-carousel audio-carousel" data-project-id="${projectId}">
+                    <button class="carousel-controls carousel-prev" aria-label="Previous slide">
+                        <i class="fas fa-chevron-left"></i>
+                    </button>
+                    <button class="carousel-controls carousel-next" aria-label="Next slide">
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
+                    <div class="carousel-container">
+                        ${carouselItems}
+                    </div>
+                    <div class="carousel-indicators">
+                        ${indicators}
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+    
     if (mediaItems.length === 1) {
         // Single item - no carousel needed
         const item = mediaItems[0];
@@ -40,6 +113,18 @@ function generateCarousel(mediaItems, projectId, currentLang) {
                 const title = currentLang === 'en' ? (item.titleEn || item.title) : (item.titleRu || item.title);
                 mediaHTML = `<a href="${item.url}" target="_blank" rel="noopener noreferrer">${title || 'Watch Video'}</a>`;
             }
+        } else if (item.type === 'audio') {
+            const label = currentLang === 'en' ? (item.label || 'Audio') : (item.labelRu || item.label || 'Audio');
+            const audioType = item.src.endsWith('.wav') ? 'audio/wav' : 'audio/mpeg';
+            mediaHTML = `
+                <div class="audio-player-wrapper">
+                    <div class="audio-label">${label}</div>
+                    <audio controls preload="metadata">
+                        <source src="${item.src}" type="${audioType}">
+                        Your browser does not support the audio element.
+                    </audio>
+                </div>
+            `;
         }
         
         return `
@@ -71,6 +156,18 @@ function generateCarousel(mediaItems, projectId, currentLang) {
                 const title = currentLang === 'en' ? (item.titleEn || item.title) : (item.titleRu || item.title);
                 mediaHTML = `<a href="${item.url}" target="_blank" rel="noopener noreferrer">${title || 'Watch Video'}</a>`;
             }
+        } else if (item.type === 'audio') {
+            const label = currentLang === 'en' ? (item.label || 'Audio') : (item.labelRu || item.label || 'Audio');
+            const audioType = item.src.endsWith('.wav') ? 'audio/wav' : 'audio/mpeg';
+            mediaHTML = `
+                <div class="audio-player-wrapper">
+                    <div class="audio-label">${label}</div>
+                    <audio controls preload="metadata">
+                        <source src="${item.src}" type="${audioType}">
+                        Your browser does not support the audio element.
+                    </audio>
+                </div>
+            `;
         }
         
         return `<div class="carousel-item" data-index="${index}">${mediaHTML}</div>`;

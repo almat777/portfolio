@@ -1711,6 +1711,85 @@
             display: none;
         }
 
+        /* Audio Player Styles - Clean & Simple */
+        .project-media.audio-comparison {
+            height: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            padding: 15px 20px;
+            background: transparent;
+            border-radius: 0;
+            align-items: stretch;
+        }
+
+        .audio-player-wrapper {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .audio-label {
+            font-size: 0.75rem;
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.6);
+            text-align: left;
+            padding: 0;
+            margin-bottom: 2px;
+        }
+
+        .audio-player-wrapper audio {
+            width: 100%;
+            height: 40px;
+            outline: none;
+        }
+
+        /* Audio Carousel (multiple pages of audio) */
+        .project-carousel.audio-carousel {
+            height: auto;
+            min-height: 200px;
+        }
+
+        .project-carousel.audio-carousel .carousel-item {
+            height: auto;
+            min-height: 200px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            padding: 15px 20px;
+            align-items: stretch;
+            justify-content: flex-start;
+        }
+
+        /* Single audio item (fallback) */
+        .project-carousel.single-item .audio-player-wrapper {
+            margin: 10px 0;
+            max-width: 100%;
+        }
+
+        @media (max-width: 768px) {
+            .project-media.audio-comparison {
+                flex-direction: column;
+                padding: 10px 15px;
+                gap: 15px;
+            }
+
+            .audio-label {
+                font-size: 0.7rem;
+            }
+
+            .project-carousel.audio-carousel {
+                min-height: 180px;
+            }
+
+            .project-carousel.audio-carousel .carousel-item {
+                min-height: 180px;
+                padding: 10px 15px;
+                gap: 15px;
+            }
+        }
+
         @media (max-width: 768px) {
             .project-carousel {
                 height: 180px;
