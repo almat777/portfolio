@@ -539,10 +539,10 @@
             // Track email/phone copy attempts
             document.addEventListener('copy', function(e) {
                 const selection = window.getSelection().toString();
-                if (selection.includes('arsen801777@gmail.com')) {
-                    trackEvent('contact_copy', { contactType: 'email', contactValue: 'arsen801777@gmail.com' });
+                if (selection.includes('almatinow@gmail.com')) {
+                    trackEvent('contact_copy', { contactType: 'email', contactValue: 'almatinow@gmail.com' });
                 } else if (selection.includes('+7 707 446 6793')) {
-                    trackEvent('contact_copy', { contactType: 'phone', contactValue: '+7 707 446 6793' });
+                    trackEvent('contact_copy', { contactType: 'phone', contactValue: '+7 708 169 5426' });
                 }
             });
 
