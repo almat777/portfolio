@@ -5,7 +5,7 @@
 const projectsData = [
     {
         id: 1,
-        titleEn: "Enterprise AI Assistant & Data Pipeline — FinReg Agency",
+        titleEn: "Development of multirobot painting control system with realtime monitoring",
         titleRu: "Корпоративный AI Ассистент и Конвейер Данных — FinReg",
         descEn: "Designed and implemented two end-to-end systems on the n8n platform during internship at Financial Regulatory Agency. Built a sophisticated RAG system for an AI assistant including full data pipeline: web scraping, text vectorization (embeddings), and storage/retrieval from PostgreSQL with PGVector extension. Developed automated report generation system integrating GLPI and Bitrix24 through reverse-engineered APIs and LLM-powered data extraction from .docx files (Ollama). Architected fault-tolerant asynchronous workflows using distributed locking mechanism in PostgreSQL to resolve race conditions. Implemented a PULL-based data retrieval model to bypass network security restrictions.",
         descRu: "Разработал и внедрил две комплексные системы на платформе n8n во время стажировки в Агентстве финансового регулирования. Создал продвинутую RAG систему для AI ассистента, включая полный конвейер данных: веб-скрейпинг, векторизацию текста (embeddings) и хранение/извлечение из PostgreSQL с расширением PGVector. Разработал систему автоматической генерации отчётов с интеграцией GLPI и Bitrix24 через реверс-инжиниринг API и извлечением структурированных данных из .docx файлов с помощью LLM (Ollama). Спроектировал отказоустойчивые асинхронные воркфлоу, используя механизм распределённых блокировок в PostgreSQL для решения состояний гонки. Реализовал PULL-модель получения данных для обхода ограничений сетевой безопасности.",
