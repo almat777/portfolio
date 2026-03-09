@@ -58,8 +58,8 @@ function initChatbot() {
     fetchUserIP();
     
     // Initialize conversation with the welcome message
-    const welcomeMessageEn = "Hello, I'm Arsen Kenesbayev\nData Engineer skilled in SQL & Python, passionate about turning data into smart, efficient, and user-friendly solutions.\nAsk my AI any questions about me.";
-    const welcomeMessageRu = "Привет, я Арсен Кенесбаев\nИнженер данных, владеющий SQL и Python, увлеченный превращением данных в умные, эффективные и удобные решения.\nЗадайте моему ИИ любые вопросы обо мне.";
+    const welcomeMessageEn = "Hello, I'm Almat Abdimalik\nAutomation and Robotics Engineer passionate about PLCs, robotics, and industrial systems engineering.\nAsk my AI any questions about me.";
+    const welcomeMessageRu = "Привет, я Алмат Абдиалик\nИнженер автоматизации и робототехники, увлеченный PLC, роботами и инженерными системами.\nЗадайте моему ИИ любые вопросы обо мне.";
     
     // Add welcome message to history (if not already added)
     if (conversationHistory.length === 0) {
