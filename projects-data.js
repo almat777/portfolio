@@ -6,10 +6,10 @@ const projectsData = [
     
     {
         id: 6,
-        titleEn: "Qysqa AI Learning Platform",
-        titleRu: "AI Платформа для Обучения Qysqa",
-        descEn: "AI learning platform that creates open/closed tests and evaluates answers, allows users to upload multiple types of data (.txt, .pptx, .pdf, .docx, YouTube videos, etc.) and ask questions about selected data. Features intelligent test generation, automatic grading, and multi-format content processing.",
-        descRu: "Платформа для обучения с ИИ, создаёт открытые/закрытые тесты и оценивает ответы, позволяет пользователю загружать различные типы данных (.txt, .pptx, .pdf, .docx, YouTube-видео и т.д.) и задавать вопросы по выбранным данным. Включает интеллектуальную генерацию тестов, автоматическую оценку и обработку контента различных форматов.",
+        titleEn: "Development of multirobot painting control system with realtime monitoring",
+        titleRu: "Разработка системы управления несколькими роботами для покраски с мониторингом в реальном времени",
+        descEn: "Development of a multirobot painting control system with realtime monitoring capabilities. The system allows for coordinated control of multiple robots during the painting process, ensuring consistent quality and efficiency.",
+        descRu: "Разработка системы управления несколькими роботами для покраски с возможностью мониторинга в реальном времени. Система позволяет координировать действия нескольких роботов во время процесса покраски, обеспечивая согласованность качества и эффективность.",
         media: [
             { type: "image", src: "media/qysqa.png", altEn: "Qysqa AI Learning Platform", altRu: "Платформа для обучения с ИИ Qysqa" }
         ],
