@@ -5,50 +5,50 @@
 const projectsData = [
     
     {
-    id: 6,
-    titleEn: "Development of multirobot painting control system with realtime monitoring",
-    titleRu: "Разработка системы управления несколькими роботами для покраски с мониторингом в реальном времени",
-    descEn: "An automated multirobot painting line that coordinates industrial manipulators, conveyor motion, and process monitoring in real time to improve efficiency, coating quality, and operator safety.",
-    descRu: "Автоматизированная линия покраски с несколькими роботами, которая координирует работу промышленных манипуляторов, движение конвейера и мониторинг процесса в реальном времени для повышения эффективности, качества покрытия и безопасности операторов.",
-    media: [
-        { type: "image", src: "media/dev1.jpg", altEn: "Multirobot Painting System", altRu: "Система Многороботной Покраски" },
-        { type: "youtube", url: "https://www.youtube.com/embed/7L7fTCguy7g", titleEn: "Course project", titleRu: "Курсовой проект" }
-    ],
-    tech: ["HTML/CSS/JS", "Gemini API", "Flask", "Python", "youtube-transcript-api", "BeautifulSoup4", "Document Processing"],
-    links: [
-        { type: "github", url: "https://github.com/Skyshmallow/qysqa", textEn: "GitHub", textRu: "GitHub" },
-        { type: "presentation", url: "https://www.canva.com/design/DAGnKoFN27Q/z6sDIdcEZAHixtGoYherAw/edit?utm_content=DAGnKoFN27Q&utm_campaign=designshare&utm_medium=link2&utm_source=sharebutton", textEn: "Presentation", textRu: "Презентация" }
-    ]
-    },
-    {
-        id: 7,
-        titleEn: "Movie Recommendation System",
-        titleRu: "Система Рекомендации Фильмов",
-        descEn: "Built a movie recommender with content-based filtering (TF-IDF + cosine similarity), with ability to watch trailers, user auth, dark/light mode, and an Akinator-style assistant. Processed 5,000+ TMDB movies with advanced NLP techniques for personalized recommendations.",
-        descRu: "Разработал систему рекомендации фильмов с контентной фильтрацией (TF-IDF + косинусное сходство), с возможностью просмотра трейлеров, авторизацией пользователей, тёмной/светлой темой и помощником в стиле Akinator. Обработано более 5000 фильмов из TMDB с использованием продвинутых NLP техник для персонализированных рекомендаций.",
+        id: 1,
+        titleEn: "Development of multirobot painting control system with realtime monitoring",
+        titleRu: "Разработка системы управления несколькими роботами для покраски с мониторингом в реальном времени",
+        descEn: "An automated multirobot painting line that coordinates industrial manipulators, conveyor motion, and process monitoring in real time to improve efficiency, coating quality, and operator safety.",
+        descRu: "Автоматизированная линия покраски с несколькими роботами, которая координирует работу промышленных манипуляторов, движение конвейера и мониторинг процесса в реальном времени для повышения эффективности, качества покрытия и безопасности операторов.",
         media: [
-            { type: "image", src: "media/popcorn (1).png", altEn: "Movie Recommendation System", altRu: "Система Рекомендации Фильмов" }
+            { type: "image", src: "media/dev1.jpg", altEn: "Multirobot Painting System", altRu: "Система Многороботной Покраски" },
+            { type: "youtube", url: "https://www.youtube.com/embed/7L7fTCguy7g", titleEn: "Course project", titleRu: "Курсовой проект" }
         ],
-        tech: ["Flask", "TMDB API", "Scikit-learn", "TF-IDF", "Cosine Similarity", "NLP", "Matplotlib", "Waitress", "Ngrok"],
+        tech: ["MATLAB", "TIA Portal", "Siemens PLC", "RoArm-M2-S", "KUKA", "PID", "Wi-Fi/HTTP", "Real-Time Monitoring"],
         links: [
-            { type: "github", url: "https://github.com/Skyshmallow/Movie-Recommendation-System-for-ML", textEn: "GitHub", textRu: "GitHub" },
-            { type: "presentation", url: "https://www.canva.com/design/DAGnKi5m3TE/lA1QYrb8ai3ZamYxoTOMNg/edit?utm_content=DAGnKi5m3TE&utm_campaign=designshare&utm_medium=link2&utm_source=sharebutton", textEn: "Presentation", textRu: "Презентация" },
-            { type: "documentation", url: "https://www.canva.com/design/DAGYi1dxqsQ/MlkfnETaGHBtzuR4I5AamQ/edit?utm_content=DAGYi1dxqsQ&utm_campaign=designshare&utm_medium=link2&utm_source=sharebutton", textEn: "Documentation", textRu: "Документация" }
+            { type: "youtube", url: "https://www.youtube.com/embed/7L7fTCguy7g", textEn: "YouTube", textRu: "YouTube" },
+            { type: "github", url: "https://github.com/rassulz/multirobot_painting_control_system", textEn: "GitHub", textRu: "GitHub" }
         ]
     },
     {
-        id: 8,
-        titleEn: "Personal Portfolio Website",
-        titleRu: "Персональный Веб-сайт Портфолио",
-        descEn: "Built a modern, responsive portfolio website featuring bilingual support (EN/RU), intelligent search with real-time highlighting, comprehensive analytics system, and integrated feedback collection. Includes dark theme, smooth animations, mobile-first design, and advanced lightbox with navigation for project images.",
-        descRu: "Разработал современный адаптивный веб-сайт портфолио с двуязычной поддержкой (EN/RU), интеллектуальным поиском с подсветкой в реальном времени, комплексной системой аналитики и интегрированным сбором отзывов. Включает тёмную тему, плавные анимации, mobile-first дизайн и продвинутый лайтбокс с навигацией для изображений проектов.",
+        id: 2,
+        titleEn: "Self Balancing Twin-Propeller Inverted-Pendulum",
+        titleRu: "Самобалансирующийся Инвертированный Маятник с Двойными Винтами",
+        descEn: "A control project focused on implementing and tuning a PID controller for a self-balancing BLDC motor system, demonstrating feedback control, stability analysis, and real-time motor regulation.",
+        descRu: "Проект по управлению, посвящённый реализации и настройке PID-контроллера для системы с бесщеточным двигателем, демонстрирующий управление с обратной связью, анализ устойчивости и регулирование двигателя в реальном времени.",
         media: [
-            { type: "image", src: "media/portfolio.png", altEn: "Personal Portfolio Website", altRu: "Персональный Веб-сайт Портфолио" }
+            { type: "image", src: "media/prop.jpg", altEn: "Self Balancing Inverted Pendulum", altRu: "Самобалансирующийся Инвертированный Маятник" },
+            { type: "youtube", url: "https://www.youtube.com/embed/7L7fTCguy7g", titleEn: "First video", titleRu: "Первое видео" }
+        ],
+        tech: ["Flask", "TMDB API", "Scikit-learn", "TF-IDF", "Cosine Similarity", "NLP", "Matplotlib", "Waitress", "Ngrok"],
+        links: [
+            { type: "github", url: "https://github.com/rassulz/pid_self_balance_bldc", textEn: "GitHub", textRu: "GitHub" },
+            { type: "youtube", url: "https://youtu.be/BOMwI3oKbro", textEn: "YouTube", textRu: "YouTube" }
+        ]
+    },
+    {
+        id: 3,
+        titleEn: "Machine Learning Integration with PLC for Industrial Process Control",
+        titleRu: "Интеграция Машинообучения с PLC для Управления Промышленными Процессами",
+        descEn: "An industrial automation project that integrates machine learning models with PLC systems using OPC UA, enabling data-driven quality prediction and intelligent process monitoring in an industrial environment.",
+        descRu: "Промышленный проект автоматизации, который интегрирует модели машинного обучения с системами PLC с помощью OPC UA, обеспечивая предсказание качества на основе данных и интеллектуальный мониторинг процессов в промышленной среде.",
+        media: [
+            { type: "image", src: "media/PLC_ML_picture.png", altEn: "Machine Learning Integration with PLC", altRu: "Интеграция Машинообучения с PLC" }
         ],
         tech: ["HTML/CSS/JS", "Google Sheets API", "Google Forms", "Google Apps Script", "Analytics", "Bilingual", "Responsive Design"],
         links: [
-            { type: "github", url: "https://github.com/Skyshmallow/personal-portfolio", textEn: "GitHub", textRu: "GitHub" },
-            { type: "demo", url: "#", textEn: "Live Site", textRu: "Сайт" }
+            { type: "github", url: "https://github.com/almat777/ML_PLC_industry", textEn: "GitHub", textRu: "GitHub" },
+            { type: "youtube", url: "https://youtube.com/shorts/U-6GGcndfKo", textEn: "YouTube", textRu: "YouTube" }
         ]
     },
     {
