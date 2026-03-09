@@ -52,11 +52,11 @@ const projectsData = [
         ]
     },
     {
-        id: 9,
-        titleEn: "AI Human Tracking Camera",
-        titleRu: "Камера с ИИ-отслеживанием Человека",
-        descEn: "IoT camera system working on its own power supply with API for manual control, AI-powered human tracking, and voice control capabilities. Integrates ESP32 and Arduino Uno with computer vision algorithms for real-time human detection and automated tracking.",
-        descRu: "IoT система камеры с собственным источником питания, API для ручного управления, ИИ-отслеживанием человека и голосовым управлением. Интегрирует ESP32 и Arduino Uno с алгоритмами компьютерного зрения для обнаружения людей в реальном времени и автоматического отслеживания.",
+        id: 4,
+        titleEn: "Methodical Manual for Simit Digital Twin Software",
+        titleRu: "Методическое руководство по программе Simit Digital Twin",
+        descEn: "A comprehensive methodical manual for the Simit Digital Twin software, providing detailed instructions and best practices for using the platform in industrial simulation and modeling.",
+        descRu: "Полное методическое руководство по программе Simit Digital Twin, предоставляющее подробные инструкции и лучшие практики для использования платформы в промышленном моделировании и симуляции.",
         media: [
             { type: "image", src: "media/esp32.jpg", altEn: "AI human tracking camera", altRu: "Камера с ИИ-отслеживанием человека" },
             { type: "youtube", url: "https://youtu.be/XqcitDN1cJ0", titleEn: "AI Camera Demo", titleRu: "Демо ИИ-камеры" }
