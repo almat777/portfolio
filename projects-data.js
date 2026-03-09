@@ -53,9 +53,9 @@ const projectsData = [
     },
     {
         id: 4,
-        titleEn: "Methodical Manual for Simit Digital Twin Software",
+        titleEn: "Methodological Manual for Simit Digital Twin Software",
         titleRu: "Методическое руководство по программе Simit Digital Twin",
-        descEn: "A comprehensive methodical manual for the Simit Digital Twin software for KBTU, providing detailed instructions and best practices for using the platform in industrial simulation and modeling.",
+        descEn: "A comprehensive methodological manual for the Simit Digital Twin software for KBTU, providing detailed instructions and best practices for using the platform in industrial simulation and modeling.",
         descRu: "Полное методическое руководство по программе Simit Digital Twin для KBTU, предоставляющее подробные инструкции и лучшие практики для использования платформы в промышленной симуляции и моделировании.",
         media: [
             { type: "image", src: "media/simit.jpeg", altEn: "Simit Digital Twin", altRu: "Simit Digital Twin" },
@@ -66,9 +66,9 @@ const projectsData = [
     },
     {
         id: 5,
-        titleEn: "Methodical Manual for S7-1500 PLC Programming",
+        titleEn: "Methodological Manual for S7-1500 PLC Programming",
         titleRu: "Методическое руководство по программированию S7-1500 PLC",
-        descEn: "A comprehensive methodical manual for the S7-1500 PLC programming for KBTU, providing detailed instructions and best practices for using the platform in industrial automation and control.",
+        descEn: "A comprehensive methodological manual for the S7-1500 PLC programming for KBTU, providing detailed instructions and best practices for using the platform in industrial automation and control.",
         descRu: "Полное методическое руководство по программированию S7-1500 PLC для KBTU, предоставляющее подробные инструкции и лучшие практики для использования платформы в промышленной автоматизации и управлении.",
         media: [
             { type: "image", src: "media/manual_1500.jpeg", altEn: "S7-1500 PLC Programming", altRu: "Программирование S7-1500 PLC" }
