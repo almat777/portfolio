@@ -12,9 +12,55 @@ function getYouTubeId(url) {
     // Handle regular YouTube URLs
     const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
     const match = url.match(regExp);
-    return (match && match[2].length === 11) ? match[2] : null;
+            mediaHTML = generateYouTubePreview(item, currentLang);
 }
 
+// Generate YouTube preview iframe or fallback link
+function generateYouTubePreview(item, currentLang) {
+    const url = item.url || item.src || '';
+    const videoId = getYouTubeId(url);
+    if (videoId) {
+        return `<iframe src="https://www.youtube.com/embed/${videoId}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe>`;
+    }
+
+    const title = currentLang === 'en' ? (item.titleEn || item.title || 'Watch Video') : (item.titleRu || item.title || 'Смотреть видео');
+    const href = url || '#';
+    return `<a href="${href}" target="_blank" rel="noopener noreferrer">${title}</a>`;
+}
+// Generate YouTube preview HTML
+function generateYouTubePreview(item, currentLang) {
+    const videoId = getYouTubeId(item.url);
+    const title = currentLang === 'en' ? (item.titleEn || item.title || 'Watch Video') : (item.titleRu || item.title || 'Смотреть видео');
+    const watchText = currentLang === 'en' ? 'Watch Video' : 'Смотреть видео';
+
+    if (!videoId) {
+        return `<a href="${item.url}" target="_blank" rel="noopener noreferrer" class="youtube-fallback">${title}</a>`;
+    }
+
+    return `
+        <a 
+            class="youtube-preview"
+            href="https://www.youtube.com/watch?v=${videoId}"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="${title}"
+        >
+            <img
+                class="youtube-thumb"
+                src="https://img.youtube.com/vi/${videoId}/maxresdefault.jpg"
+                alt="${title}"
+                loading="lazy"
+                onerror="this.onerror=null;this.src='https://img.youtube.com/vi/${videoId}/hqdefault.jpg';"
+            >
+            <div class="youtube-overlay">
+                <div class="youtube-play-btn">
+                    <i class="fas fa-play"></i>
+                </div>
+                <span class="youtube-watch-text">${watchText}</span>
+            </div>
+        </a>
+    `;
+}
 // Generate carousel HTML
 function generateCarousel(mediaItems, projectId, currentLang) {
     if (!mediaItems || mediaItems.length === 0) {
@@ -106,13 +152,8 @@ function generateCarousel(mediaItems, projectId, currentLang) {
             const alt = currentLang === 'en' ? (item.altEn || item.alt) : (item.altRu || item.alt);
             mediaHTML = `<video controls><source src="${item.src}" type="video/mp4">Your browser does not support the video tag.</video>`;
         } else if (item.type === 'youtube') {
-            const videoId = getYouTubeId(item.url);
-            if (videoId) {
-                mediaHTML = `<iframe src="https://www.youtube.com/embed/${videoId}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe>`;
-            } else {
-                const title = currentLang === 'en' ? (item.titleEn || item.title) : (item.titleRu || item.title);
-                mediaHTML = `<a href="${item.url}" target="_blank" rel="noopener noreferrer">${title || 'Watch Video'}</a>`;
-            }
+                mediaHTML = generateYouTubePreview(item, currentLang);
+            
         } else if (item.type === 'audio') {
             const label = currentLang === 'en' ? (item.label || 'Audio') : (item.labelRu || item.label || 'Audio');
             const audioType = item.src.endsWith('.wav') ? 'audio/wav' : 'audio/mpeg';
@@ -149,13 +190,8 @@ function generateCarousel(mediaItems, projectId, currentLang) {
             const alt = currentLang === 'en' ? (item.altEn || item.alt) : (item.altRu || item.alt);
             mediaHTML = `<video controls><source src="${item.src}" type="video/mp4">Your browser does not support the video tag.</video>`;
         } else if (item.type === 'youtube') {
-            const videoId = getYouTubeId(item.url);
-            if (videoId) {
-                mediaHTML = `<iframe src="https://www.youtube.com/embed/${videoId}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe>`;
-            } else {
-                const title = currentLang === 'en' ? (item.titleEn || item.title) : (item.titleRu || item.title);
-                mediaHTML = `<a href="${item.url}" target="_blank" rel="noopener noreferrer">${title || 'Watch Video'}</a>`;
-            }
+            mediaHTML = generateYouTubePreview(item, currentLang);
+            
         } else if (item.type === 'audio') {
             const label = currentLang === 'en' ? (item.label || 'Audio') : (item.labelRu || item.label || 'Audio');
             const audioType = item.src.endsWith('.wav') ? 'audio/wav' : 'audio/mpeg';
