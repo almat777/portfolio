@@ -750,7 +750,7 @@
                         
                         // Collect all images from this project
                         const projectImages = [];
-                        projectCard.querySelectorAll('.project-media img:not(.youtube-thumb)').forEach(img => {
+                        projectCard.querySelectorAll('.project-media img').forEach(img => {
                             projectImages.push({
                                 src: img.src,
                                 alt: img.alt
@@ -758,7 +758,7 @@
                         });
                         
                         // Add click handler to each image
-                        projectCard.querySelectorAll('.project-media img:not(.youtube-thumb)').forEach((img, index) => {
+                        projectCard.querySelectorAll('.project-media img').forEach((img, index) => {
                             // Remove existing listeners to avoid duplicates
                             const newImg = img.cloneNode(true);
                             img.parentNode.replaceChild(newImg, img);
