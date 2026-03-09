@@ -670,7 +670,63 @@
         .project-links a:hover {
             color: var(--accent-blue);
         }
-        
+        /* Youtube Section */
+        .youtube-preview {
+            position: relative;
+            display: block;
+            width: 100%;
+            height: 220px;
+            overflow: hidden;
+            border-radius: 10px 10px 0 0;
+            background-color: #111;
+            text-decoration: none;
+        }
+
+        .youtube-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            transition: transform 0.35s ease, filter 0.35s ease;
+        }
+
+        .youtube-preview:hover img {
+            transform: scale(1.04);
+            filter: brightness(0.75);
+        }
+
+        .youtube-overlay {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            background: rgba(0, 0, 0, 0.25);
+            color: white;
+        }
+
+        .youtube-play-btn {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            background: rgba(255, 0, 0, 0.9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.35);
+        }
+
+        .youtube-watch-text {
+            font-size: 1rem;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+        }
+
+
+
         /* CV Section */
         .cv-section {
             max-width: 1200px;
@@ -1814,3 +1870,4 @@
                 filter: none;
             }
         }
+        

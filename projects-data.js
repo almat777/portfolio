@@ -11,7 +11,7 @@ const projectsData = [
     descEn: "Development of a multirobot painting control system with realtime monitoring capabilities. The system allows for coordinated control of multiple robots during the painting process, ensuring consistent quality and efficiency.",
     descRu: "Разработка системы управления несколькими роботами для покраски с возможностью мониторинга в реальном времени. Система позволяет координировать действия нескольких роботов во время процесса покраски, обеспечивая согласованность качества и эффективность.",
     media: [
-        { type: "youtube", url: "https://www.youtube.com/embed/7L7fTCguy7g", titleEn: "Course project", titleRu: "Курсовой проект" }
+        { type: "youtube", videoId: "7L7fTCguy7g", titleEn: "Course project", titleRu: "Курсовой проект" }
     ],
     tech: ["HTML/CSS/JS", "Gemini API", "Flask", "Python", "youtube-transcript-api", "BeautifulSoup4", "Document Processing"],
     links: [
