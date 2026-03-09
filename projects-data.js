@@ -5,19 +5,19 @@
 const projectsData = [
     
     {
-        id: 6,
-        titleEn: "Development of multirobot painting control system with realtime monitoring",
-        titleRu: "Разработка системы управления несколькими роботами для покраски с мониторингом в реальном времени",
-        descEn: "Development of a multirobot painting control system with realtime monitoring capabilities. The system allows for coordinated control of multiple robots during the painting process, ensuring consistent quality and efficiency.",
-        descRu: "Разработка системы управления несколькими роботами для покраски с возможностью мониторинга в реальном времени. Система позволяет координировать действия нескольких роботов во время процесса покраски, обеспечивая согласованность качества и эффективность.",
-        media: [
-            { type: "youtube", url: "https://youtu.be/7L7fTCguy7g", titleEn: "Course project", titleRu: "Курсовой проект" }
-        ],
-        tech: ["HTML/CSS/JS", "Gemini API", "Flask", "Python", "youtube-transcript-api", "BeautifulSoup4", "Document Processing"],
-        links: [
-            { type: "github", url: "https://github.com/Skyshmallow/qysqa", textEn: "GitHub", textRu: "GitHub" },
-            { type: "presentation", url: "https://www.canva.com/design/DAGnKoFN27Q/z6sDIdcEZAHixtGoYherAw/edit?utm_content=DAGnKoFN27Q&utm_campaign=designshare&utm_medium=link2&utm_source=sharebutton", textEn: "Presentation", textRu: "Презентация" }
-        ]
+    id: 6,
+    titleEn: "Development of multirobot painting control system with realtime monitoring",
+    titleRu: "Разработка системы управления несколькими роботами для покраски с мониторингом в реальном времени",
+    descEn: "Development of a multirobot painting control system with realtime monitoring capabilities. The system allows for coordinated control of multiple robots during the painting process, ensuring consistent quality and efficiency.",
+    descRu: "Разработка системы управления несколькими роботами для покраски с возможностью мониторинга в реальном времени. Система позволяет координировать действия нескольких роботов во время процесса покраски, обеспечивая согласованность качества и эффективность.",
+    media: [
+        { type: "youtube", url: "https://www.youtube.com/embed/7L7fTCguy7g", titleEn: "Course project", titleRu: "Курсовой проект" }
+    ],
+    tech: ["HTML/CSS/JS", "Gemini API", "Flask", "Python", "youtube-transcript-api", "BeautifulSoup4", "Document Processing"],
+    links: [
+        { type: "github", url: "https://github.com/Skyshmallow/qysqa", textEn: "GitHub", textRu: "GitHub" },
+        { type: "presentation", url: "https://www.canva.com/design/DAGnKoFN27Q/z6sDIdcEZAHixtGoYherAw/edit?utm_content=DAGnKoFN27Q&utm_campaign=designshare&utm_medium=link2&utm_source=sharebutton", textEn: "Presentation", textRu: "Презентация" }
+    ]
     },
     {
         id: 7,
