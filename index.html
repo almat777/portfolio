@@ -3,213 +3,87 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Almat Abdimalik | Portfolio</title>
+    <meta name="theme-color" content="#0a0b0c">
+    <meta name="description" content="Almat Abdimalik — automation and robotics engineer. Projects in PLC control, SCADA, KUKA robotics and industrial machine learning.">
+    <title>Almat Abdimalik — Automation & Robotics</title>
+    <link rel="icon" href="favicon.svg" type="image/svg+xml">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="styles.css">
+    <script src="projects-data.js" defer></script>
+    <script src="project-generator.js" defer></script>
+    <script src="main.js" defer></script>
+    <script src="assistant-config.js" defer></script>
+    <script src="assistant-knowledge.js" defer></script>
+    <script src="chatbot.js" defer></script>
 </head>
 <body>
-    <!-- Lightbox Modal -->
-    <div class="lightbox" id="lightbox">
-        <div class="lightbox-content">
-            <img class="lightbox-image" id="lightboxImage" src="#" alt="" style="display: none;">
-            <button class="lightbox-close" id="lightboxClose">
-                <i class="fas fa-times"></i>
-            </button>
-            <button class="lightbox-nav lightbox-prev" id="lightboxPrev" style="display: none;">
-                <i class="fas fa-chevron-left"></i>
-            </button>
-            <button class="lightbox-nav lightbox-next" id="lightboxNext" style="display: none;">
-                <i class="fas fa-chevron-right"></i>
-            </button>
-            <div class="lightbox-title" id="lightboxTitle"></div>
-            <div class="lightbox-counter" id="lightboxCounter" style="display: none;"></div>
-        </div>
-    </div>
-
-    <!-- Header -->
-    <header>
-        <nav>
-            <a href="#" class="logo">Almat Abdimalik</a>
-            <div class="nav-links" id="navLinks">
-                <a href="#projects" class="lang-en">Projects</a>
-                <a href="#projects" class="lang-ru" style="display: none;">Проекты</a>
-                <a href="#cv" class="lang-en">CV</a>
-                <a href="#cv" class="lang-ru" style="display: none;">Резюме</a>
-                <a href="#contact" class="lang-en">Contact</a>
-                <a href="#contact" class="lang-ru" style="display: none;">Контакты</a>
-            </div>
-            <div class="language-switcher">
-                <button id="langToggle" class="lang-btn">
-                    <span class="lang-text">EN</span>
-                    <i class="fas fa-globe"></i>
-                </button>
-            </div>
-            <button class="hamburger" id="hamburger">
-                <i class="fas fa-bars"></i>
-            </button>
+    <a class="skip-link" href="#main" data-en="Skip to content" data-ru="К содержимому">Skip to content</a>
+    <header class="site-header">
+        <nav class="navigation container" aria-label="Main navigation" data-label-en="Main navigation" data-label-ru="Основная навигация">
+            <a href="#home" class="brand" aria-label="Almat Abdimalik — home"><span class="brand-mark" aria-hidden="true">A<span>.</span></span><span class="brand-name">ALMAT<span>ABDIMALIK</span></span></a>
+            <div class="nav-links" id="navLinks"><a href="#projects" data-en="Projects" data-ru="Проекты">Projects</a><a href="#about" data-en="About" data-ru="Обо мне">About</a><a href="#cv" data-en="Resume" data-ru="Резюме">Resume</a><a href="#contact" data-en="Contact" data-ru="Контакты">Contact</a></div>
+            <div class="nav-actions"><button type="button" id="langToggle" class="language-toggle" aria-label="Switch to Russian"><span class="language-en">EN</span><span class="language-divider" aria-hidden="true">/</span><span class="language-ru">RU</span></button><a class="nav-contact" href="mailto:almatinow@gmail.com"><span data-en="Let's talk" data-ru="Написать">Let's talk</span><span aria-hidden="true">↗</span></a><button type="button" class="menu-toggle" id="hamburger" aria-controls="navLinks" aria-expanded="false" aria-label="Open navigation" data-label-en="Open navigation" data-label-ru="Открыть меню"><span></span><span></span></button></div>
         </nav>
     </header>
-    
-    <!-- Hero Section -->
-    <section class="hero">
-        <div class="hero-content">
-            <h1 class="lang-en">Hello, I'm <span>Almat Abdimalik</span></h1>
-            <h1 class="lang-ru" style="display: none;">Привет, я <span>Алмат Абдималик</span></h1>
-            <p class="lang-en">Automation and Robotics Engineer passionate about PLCs, robotics, and industrial systems engineering.</p>
-            <p class="lang-ru" style="display: none;">Инженер по автоматизации и робототехнике, увлеченный PLC, робототехникой и разработкой промышленных систем.</p>
-            <a href="#projects" class="btn lang-en">View My Projects</a>
-            <a href="#projects" class="btn lang-ru" style="display: none;">Посмотреть Проекты</a>
-            
-            <!-- AI Chatbot -->
+    <main id="main">
+        <section class="hero container" id="home" aria-labelledby="heroName">
+            <div class="hero-copy">
+                <p class="eyebrow"><span class="small-line" aria-hidden="true"></span><span data-en="AUTOMATION & ROBOTICS" data-ru="АВТОМАТИЗАЦИЯ И РОБОТОТЕХНИКА">AUTOMATION & ROBOTICS</span></p>
+                <h1 id="heroName"><span data-en="Almat" data-ru="Алмат">Almat</span><span class="accent" data-en="Abdimalik." data-ru="Абдималик.">Abdimalik.</span></h1>
+                <p class="hero-role" data-en="Connecting code to the physical world." data-ru="Соединяю код и реальный мир.">Connecting code to the physical world.</p>
+                <p class="hero-description" data-en="Automation and robotics engineer working with PLCs, SCADA and industrial robots. Explore the systems, experiments and ideas behind my projects." data-ru="Инженер по автоматизации и робототехнике. Работаю с PLC, SCADA и промышленными роботами. Здесь — мои проекты, эксперименты и инженерные решения.">Automation and robotics engineer working with PLCs, SCADA and industrial robots. Explore the systems, experiments and ideas behind my projects.</p>
+                <div class="hero-buttons"><a class="button button-primary" href="#projects"><span data-en="Explore projects" data-ru="Смотреть проекты">Explore projects</span><span aria-hidden="true">↗</span></a><a class="button button-outline" href="media/Almat_Abdimalik_CV.pdf" download><span data-en="Download CV" data-ru="Скачать резюме">Download CV</span><span aria-hidden="true">↓</span></a></div>
+                <div class="hero-location"><span class="location-dot" aria-hidden="true"></span><span data-en="Almaty, Kazakhstan" data-ru="Алматы, Казахстан">Almaty, Kazakhstan</span><span class="hero-location-separator" aria-hidden="true">/</span><a href="https://github.com/almat777" target="_blank" rel="noopener noreferrer">GITHUB ↗</a></div>
+            </div>
+            <div class="hero-visual">
+                <div class="visual-topline"><span>01 / SELECTED SYSTEM</span><span class="visual-cross" aria-hidden="true">+</span></div>
+                <button class="hero-project" type="button" data-project="1" aria-haspopup="dialog" aria-controls="projectDialog" aria-label="Explore the multirobot painting project" data-label-en="Explore the multirobot painting project" data-label-ru="Открыть проект роботизированной покраски">
+                    <img src="media/diploma/render_laboratory_cell.png" alt="Laboratory cell with KUKA, painting arms and Siemens control station" data-alt-en="Laboratory cell with KUKA, painting arms and Siemens control station" data-alt-ru="Лабораторная ячейка с KUKA, покрасочными манипуляторами и станцией управления Siemens" width="1486" height="856" fetchpriority="high">
+                    <span class="visual-image-label" aria-hidden="true">CONTROL / COORDINATE / MONITOR</span><span class="visual-open" aria-hidden="true">↗</span>
+                    <span class="visual-project-caption"><span><span class="mono accent" data-en="GRADUATION PROJECT · 2026" data-ru="ДИПЛОМНЫЙ ПРОЕКТ · 2026">GRADUATION PROJECT · 2026</span><strong data-en="Multirobot painting system" data-ru="Роботизированная покраска">Multirobot painting system</strong></span><span class="visual-caption-number" aria-hidden="true">01</span></span>
+                </button>
+                <div class="visual-bottomline"><span>PLC</span><span>SCADA</span><span>KUKA</span><span aria-hidden="true">— — —</span></div>
+            </div>
+            <a class="hero-scroll" href="#projects"><span data-en="SCROLL TO EXPLORE" data-ru="ПЕРЕЙТИ К ПРОЕКТАМ">SCROLL TO EXPLORE</span><span aria-hidden="true">↓</span></a>
+        </section>
+        <div class="stack-strip"><div class="container stack-items" aria-label="Core technologies" data-label-en="Core technologies" data-label-ru="Основные технологии"><span>SIEMENS PLC</span><span>WINCC / SCADA</span><span>KUKA ROBOTICS</span><span>MATLAB / SIMULINK</span><span>PYTHON</span></div></div>
+        <section class="projects-section container section" id="projects" aria-labelledby="projectsHeading">
+            <div class="section-topline"><span class="eyebrow" data-en="01 / SELECTED WORK" data-ru="01 / ПРОЕКТЫ">01 / SELECTED WORK</span><span class="mono muted" id="projectCount">05 PROJECTS</span></div>
+            <div class="projects-heading-row"><div><h2 id="projectsHeading"><span data-en="Ideas into systems" data-ru="От идеи к системе">Ideas into systems</span><span class="accent">.</span></h2><p class="section-intro" data-en="A closer look at what I build, and how it works." data-ru="Что я создаю, как это устроено и что стоит за каждым проектом.">A closer look at what I build, and how it works.</p></div><div class="search-box"><label class="sr-only" for="projectSearch" data-en="Search projects or technologies" data-ru="Поиск проектов или технологий">Search projects or technologies</label><span aria-hidden="true">⌕</span><input id="projectSearch" type="search" placeholder="Search projects, technologies..." data-placeholder-en="Search projects, technologies..." data-placeholder-ru="Проект или технология..." autocomplete="off"><button type="button" id="clearSearch" class="clear-search" hidden aria-label="Clear search" data-label-en="Clear search" data-label-ru="Очистить поиск">×</button></div></div>
+            <p id="searchInfo" class="sr-only" role="status" aria-live="polite"></p><div class="project-cards" id="projectCardsContainer"></div>
+            <div id="noResults" class="no-results" hidden><span class="mono accent">0 / 0</span><h3 data-en="No projects found" data-ru="Проекты не найдены">No projects found</h3><p data-en="Try another keyword, such as PLC, KUKA or Python." data-ru="Попробуй другой запрос: PLC, KUKA или Python.">Try another keyword, such as PLC, KUKA or Python.</p></div>
+            <noscript><p class="no-results">Enable JavaScript to explore project details. <a href="https://github.com/almat777">View projects on GitHub ↗</a></p></noscript>
+            <a class="text-link all-repositories" href="https://github.com/almat777?tab=repositories" target="_blank" rel="noopener noreferrer"><span data-en="More on GitHub" data-ru="Больше на GitHub">More on GitHub</span><span aria-hidden="true">↗</span></a>
+        </section>
+        <section class="about-section section" id="about" aria-labelledby="aboutHeading"><div class="container about-grid">
+            <div class="about-photo"><img src="media/Photo.jpg" width="400" height="400" alt="Almat Abdimalik" loading="lazy"><div class="photo-caption mono"><span>ALMAT ABDIMALIK</span><span>KZ / ALMATY</span></div></div>
+            <div class="about-copy"><p class="eyebrow" data-en="02 / THE ENGINEER" data-ru="02 / ОБО МНЕ">02 / THE ENGINEER</p><h2 id="aboutHeading"><span data-en="Beyond the code" data-ru="Больше, чем код">Beyond the code</span><span class="accent">.</span></h2><p class="about-lead" data-en="I like seeing an idea move beyond a screen — into a machine that actually works." data-ru="Мне интересно превращать идеи на экране в реальные работающие установки.">I like seeing an idea move beyond a screen — into a machine that actually works.</p><p data-en="My work spans industrial automation, robotics and control systems. For our KBTU graduation project, I focused on PLC, SCADA and KUKA integration in a coordinated multirobot painting cell." data-ru="Мои направления — промышленная автоматизация, робототехника и системы управления. В дипломном проекте КБТУ я занимался PLC, SCADA и KUKA в составе роботизированной покрасочной ячейки.">My work spans industrial automation, robotics and control systems. For our KBTU graduation project, I focused on PLC, SCADA and KUKA integration in a coordinated multirobot painting cell.</p><div class="expertise-list"><div><span class="mono accent">01</span><span data-en="PLC & industrial automation" data-ru="PLC и промышленная автоматизация">PLC & industrial automation</span><span class="muted">TIA PORTAL</span></div><div><span class="mono accent">02</span><span data-en="SCADA & operator interfaces" data-ru="SCADA и интерфейсы оператора">SCADA & operator interfaces</span><span class="muted">WINCC</span></div><div><span class="mono accent">03</span><span data-en="Industrial robotics" data-ru="Промышленная робототехника">Industrial robotics</span><span class="muted">KUKA</span></div></div></div>
+        </div></section>
+        <section class="cv-section container section" id="cv" aria-labelledby="cvHeading"><div class="resume-panel"><div><p class="eyebrow" data-en="03 / EXPERIENCE & BACKGROUND" data-ru="03 / ОПЫТ И ОБРАЗОВАНИЕ">03 / EXPERIENCE & BACKGROUND</p><h2 id="cvHeading"><span data-en="The full picture" data-ru="Больше обо мне">The full picture</span><span class="accent">.</span></h2><p class="section-intro" data-en="My education, skills and experience in one document." data-ru="Образование, навыки и опыт в одном документе.">My education, skills and experience in one document.</p></div><div class="resume-actions"><a class="button button-primary" href="media/Almat_Abdimalik_CV.pdf" target="_blank" rel="noopener noreferrer"><span data-en="View resume" data-ru="Открыть резюме">View resume</span><span aria-hidden="true">↗</span></a><a class="resume-download text-link" href="media/Almat_Abdimalik_CV.pdf" download><span data-en="Download PDF" data-ru="Скачать PDF">Download PDF</span><span aria-hidden="true">↓</span></a></div></div></section>
+        <section class="contact-section section" id="contact" aria-labelledby="contactHeading"><div class="container">
+            <p class="eyebrow" data-en="04 / GET IN TOUCH" data-ru="04 / СВЯЗАТЬСЯ">04 / GET IN TOUCH</p><div class="contact-heading-row"><h2 id="contactHeading"><span data-en="Let's build" data-ru="Обсудим">Let's build</span><br><span class="accent" data-en="something real." data-ru="твой проект.">something real.</span></h2><a class="contact-arrow" href="mailto:almatinow@gmail.com" aria-label="Email Almat" data-label-en="Email Almat" data-label-ru="Написать Алмату">↗</a></div>
+            <div class="contact-bottom"><div><a class="contact-email" href="mailto:almatinow@gmail.com">almatinow@gmail.com</a><a class="contact-phone muted" href="tel:+77081695426">+7 708 169 5426</a></div><div class="social-links"><a href="https://github.com/almat777" target="_blank" rel="noopener noreferrer">GitHub ↗</a><a href="https://www.linkedin.com/in/almat-abdimalik/" target="_blank" rel="noopener noreferrer">LinkedIn ↗</a><a href="https://t.me/TheRealAlmat" target="_blank" rel="noopener noreferrer">Telegram ↗</a><a href="https://www.instagram.com/almat.abdimalik/" target="_blank" rel="noopener noreferrer">Instagram ↗</a></div></div>
             <div class="chatbot-wrapper">
-                <button class="chatbot-toggle-btn" id="chatbotToggle">
-                    <i class="fas fa-robot"></i>
-                    <span class="lang-en">Ask Almat's AI</span>
-                    <span class="lang-ru" style="display: none;">Спросить ИИ Алмата</span>
-                    <i class="fas fa-chevron-down toggle-icon"></i>
+                <button type="button" class="chatbot-toggle-btn" id="chatbotToggle" aria-expanded="false" aria-controls="chatbotContainer">
+                    <span class="chatbot-toggle-label"><span class="assistant-symbol" aria-hidden="true">✳</span><span><strong data-en="Ask about my work" data-ru="Спроси о моих проектах">Ask about my work</strong><small data-en="Projects, technologies and the story behind them." data-ru="Проекты, технологии и инженерные решения.">Projects, technologies and the story behind them.</small></span></span><span class="toggle-icon" aria-hidden="true">+</span>
                 </button>
-                <div class="chatbot-container" id="chatbotContainer" style="display: none;">
-                    <div class="chatbot-header">
-                        <div class="chatbot-title">
-                            <i class="fas fa-robot"></i>
-                            <span class="lang-en">Almat's AI Assistant</span>
-                            <span class="lang-ru" style="display: none;">ИИ-Помощник Алмата</span>
-                        </div>
-                        <span class="experimental-badge lang-en">Under Development</span>
-                        <span class="experimental-badge lang-ru" style="display: none;">Еще ведутся работы над этим</span>
-                    </div>
-                    <div class="chatbot-messages" id="chatbotMessages">
-                        <div class="message ai-message">
-                            <div class="message-avatar">
-                                <i class="fas fa-robot"></i>
-                            </div>
-                            <div class="message-content">
-                                <p class="lang-en">Hello, I'm Almat Abdimalik<br>Automation and Robotics Engineer passionate about PLCs, robotics, and industrial systems engineering.<br><strong>Ask my AI any questions about me.</strong></p>
-                                <p class="lang-ru" style="display: none;">Привет, я Алмат Абдиалик<br>Инженер по автоматизации и робототехнике, увлеченный PLC, робототехникой и разработкой промышленных систем.<br><strong>Задайте моему ИИ любые вопросы обо мне.</strong></p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="chatbot-input-container">
-                        <input type="text" id="chatbotInput" class="chatbot-input lang-en" placeholder="Ask me anything...">
-                        <input type="text" id="chatbotInputRu" class="chatbot-input lang-ru" style="display: none;" placeholder="Спросите что угодно...">
-                        <button id="chatbotSend" class="chatbot-send-btn">
-                            <i class="fas fa-paper-plane"></i>
-                        </button>
-                    </div>
-                    <div class="chatbot-loading" id="chatbotLoading" style="display: none;">
-                        <div class="loading-dots">
-                            <span></span>
-                            <span></span>w
-                            <span></span>
-                        </div>
-                    </div>
-                </div>
+                <section class="chatbot-container" id="chatbotContainer" aria-labelledby="chatbotTitle" hidden>
+                    <div class="chatbot-header"><div><h3 id="chatbotTitle" data-en="Almat's portfolio assistant" data-ru="Помощник по портфолио Алмата">Almat's portfolio assistant</h3><span id="chatbotMode" class="chatbot-mode" role="status">Portfolio guide</span></div><button type="button" id="chatbotClear" class="chatbot-reset" data-en="New conversation ↻" data-ru="Новый диалог ↻">New conversation ↻</button></div>
+                    <div class="chatbot-suggestions" aria-label="Suggested questions" data-label-en="Suggested questions" data-label-ru="Примеры вопросов"><button type="button" data-chat-question="diploma" data-en="Graduation project" data-ru="Дипломный проект">Graduation project</button><button type="button" data-chat-question="contribution" data-en="My contribution" data-ru="Мой вклад">My contribution</button><button type="button" data-chat-question="skills" data-en="Technologies" data-ru="Технологии">Technologies</button><button type="button" data-chat-question="contact" data-en="Get in touch" data-ru="Связаться">Get in touch</button></div>
+                    <div class="chatbot-messages" id="chatbotMessages" role="log" aria-label="Conversation" aria-live="polite" aria-relevant="additions text" data-label-en="Conversation" data-label-ru="Переписка"></div>
+                    <div class="chatbot-request-status"><span id="chatbotStatus" role="status" aria-live="polite"></span><button type="button" id="chatbotRetry" class="chatbot-retry" hidden data-en="Retry AI reply ↻" data-ru="Повторить ИИ-запрос ↻">Retry AI reply ↻</button></div>
+                    <form id="chatbotForm" class="chatbot-form"><label class="sr-only" for="chatbotInput" data-en="Your question about Almat's work" data-ru="Твой вопрос о проектах Алмата">Your question about Almat's work</label><div class="chatbot-composer"><textarea id="chatbotInput" name="question" rows="2" maxlength="1000" placeholder="Ask about a project or technology…" data-placeholder-en="Ask about a project or technology…" data-placeholder-ru="Спроси о проекте или технологии…" aria-describedby="chatbotHint chatbotPrivacy"></textarea><button type="button" id="chatbotStop" class="chatbot-stop" hidden data-en="Stop" data-ru="Отменить">Stop</button><button type="submit" id="chatbotSend" class="chatbot-send-btn" aria-label="Send question" data-label-en="Send question" data-label-ru="Отправить вопрос" disabled>↑</button></div><div class="chatbot-input-meta"><span id="chatbotHint" data-en="Enter to send · Shift+Enter for a new line" data-ru="Enter — отправить · Shift+Enter — новая строка">Enter to send · Shift+Enter for a new line</span><span id="chatbotCount">0 / 1000</span></div></form>
+                    <p class="chatbot-privacy" id="chatbotPrivacy" data-en="Ask about Almat's work. Check important details using the source links. Reloading this page clears the conversation." data-ru="Помощник отвечает о проектах Алмата. Проверяй важные детали по ссылкам. После перезагрузки страницы диалог сбросится.">Ask about Almat's work. Check important details using the source links. Reloading this page clears the conversation.</p>
+                    <noscript><p class="chatbot-privacy">Enable JavaScript to use the portfolio assistant.</p></noscript>
+                </section>
             </div>
-        </div>
-        <img src="media/Almat.jpg" alt="Almat Abdimalik" class="profile-img">
-    </section>
-    
-    <!-- Projects Section -->
-    <section class="projects" id="projects">
-        <h2 class="section-title lang-en">My Projects</h2>
-        <h2 class="section-title lang-ru" style="display: none;">Мои Проекты</h2>
-        
-        <!-- Search Bar -->
-        <div class="search-container">
-            <div class="search-box">
-                <input type="text" id="projectSearch" placeholder="Search projects or technologies..." class="lang-en">
-                <input type="text" id="projectSearchRu" placeholder="Поиск проектов или технологий..." class="lang-ru" style="display: none;">
-                <i class="fas fa-search search-icon"></i>
-                <button class="clear-search" id="clearSearch" style="display: none;">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <div class="search-results-info" id="searchInfo">
-                <span class="lang-en">All projects shown</span>
-                <span class="lang-ru" style="display: none;">Показаны все проекты</span>
-            </div>
-        </div>
-        
-        <div class="project-cards" id="projectCardsContainer">
-            <!-- Projects will be dynamically generated here -->
-        </div>
-        
-        <!-- No Results Message -->
-        <div id="noResults" class="no-results" style="display: none;">
-            <p class="lang-en">No projects match your search criteria.</p>
-            <p class="lang-ru" style="display: none;">Нет проектов, соответствующих критериям поиска.</p>
-        </div>
-    </section>
-    
-    <!-- CV Section -->
-<section class="cv-section" id="cv">
-    <h2 class="section-title lang-en">My CV</h2>
-    <h2 class="section-title lang-ru" style="display: none;">Моё резюме</h2>
-
-    <div class="cv-container lang-en">
-        <iframe src="media/Almat_Abdimalik_CV.pdf"></iframe>
-    </div>
-
-    <div class="cv-container lang-ru" style="display: none;">
-        <iframe src="media/Almat_Abdimalik_CV.pdf"></iframe>
-    </div>
-
-    <div style="text-align: center; margin-top: 30px;">
-        <a href="media/Almat_Abdimalik_CV.pdf" download class="btn btn2 lang-en">Download CV</a>
-        <a href="media/Almat_Abdimalik_CV.pdf" download class="btn btn2 lang-ru" style="display: none;">Скачать резюме</a>
-    </div>
-</section>
-    
-    <!-- Contact Section -->
-    <section class="contact" id="contact">
-        <h2 class="section-title lang-en">Contact Me</h2>
-        <h2 class="section-title lang-ru" style="display: none;">Свяжитесь Со Мной</h2>
-        <div class="contact-info">
-            <p>
-                <i class="fas fa-paper-plane"></i>
-                almatinow@gmail.com
-            </p>
-            <p>
-                <i class="fas fa-phone-square"></i>
-                +7 708 169 5426
-            </p>
-            <p class="lang-en">
-                <i class="fas fa-map-marker-alt"></i>
-                Almaty, Kazakhstan
-            </p>
-            <p class="lang-ru" style="display: none;">
-                <i class="fas fa-map-marker-alt"></i>
-                Алматы, Казахстан
-            </p>
-            
-            <div class="social-icons">
-                <a href="https://www.linkedin.com/in/almat-abdimalik/" target="_blank">
-                    <i class="fab fa-linkedin-in"></i>
-                </a>
-                <a href="https://www.instagram.com/almat.abdimalik?igsh=cjIwNzc5Y3FhNGxp&utm_source=qr" target="_blank">
-                    <i class="fab fa-instagram"></i>
-                </a>
-                <a href="https://t.me/TheRealAlmat" target="_blank">
-                    <i class="fab fa-telegram-plane"></i>
-                </a>
-                <a href="https://github.com/almat777" target="_blank">
-                    <i class="fab fa-github"></i>
-                </a>
-            </div>
-
-    
-    <!-- Footer -->
-    <footer>
-        <div class="footer-content">
-            <p class="lang-en">&copy; 2026 Almat Abdimalik. All Rights Reserved.</p>
-            <p class="lang-ru" style="display: none;">&copy; 2026 Алмат Абдималик. Все права защищены.</p>
-            <p class="lang-en">Made with <i class="fas fa-heart" style="color: var(--accent-blue);"></i>and passion for development</p>
-            <p class="lang-ru" style="display: none;">Сделано с <i class="fas fa-heart" style="color: var(--accent-blue);"></i>и страстью к разработке</p>
-        </div>
-    </footer>
-    <script src="projects-data.js"></script>
-    <script src="project-generator.js"></script>
-    <script src="main.js"></script>
-    <script src="chatbot.js"></script>
+        </div></section>
+    </main>
+    <footer class="site-footer container"><a class="brand footer-brand" href="#home">A<span class="accent">.</span></a><p>© <span id="footerYear">2026</span> <span data-en="Almat Abdimalik" data-ru="Алмат Абдималик">Almat Abdimalik</span></p><a class="back-top mono" href="#home"><span data-en="BACK TO TOP" data-ru="НАВЕРХ">BACK TO TOP</span><span aria-hidden="true">↑</span></a></footer>
+    <dialog class="project-dialog" id="projectDialog" aria-labelledby="projectTitle" aria-describedby="projectSummary"><div class="modal-bar"><span class="mono accent" data-en="PROJECT / IN DETAIL" data-ru="ПРОЕКТ / ПОДРОБНЕЕ">PROJECT / IN DETAIL</span><div><button type="button" class="modal-language mono" id="projectLanguageToggle" aria-label="Switch language">EN / RU</button><button type="button" class="icon-button modal-close" id="projectClose" aria-label="Close project" data-label-en="Close project" data-label-ru="Закрыть проект">×</button></div></div><div class="project-detail" id="projectDetail"></div></dialog>
+    <dialog class="image-dialog" id="imageDialog" aria-label="Full size project image" data-label-en="Full size project image" data-label-ru="Изображение проекта во весь экран"><button type="button" class="icon-button image-close" id="imageClose" aria-label="Close image" data-label-en="Close image" data-label-ru="Закрыть изображение">×</button><img id="fullImage" alt=""><p id="fullImageCaption" class="mono"></p></dialog>
 </body>
 </html>

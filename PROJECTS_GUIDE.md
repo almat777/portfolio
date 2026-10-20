@@ -1,229 +1,50 @@
-# How to Add Projects - Quick Guide
+# Adding a project
 
-## Adding a New Project
+Edit `projects-data.js` and append an object to `projectsData`. Use a unique numeric ID; existing IDs are also used in shareable URLs such as `#project-1`.
 
-To add a new project, simply edit `projects-data.js` and add a new object to the `projectsData` array.
-
-### Project Structure
-
-```javascript
+```js
 {
-    id: 9,  // Unique ID (increment from last project)
-    titleEn: "Project Title in English",
-    titleRu: "Название проекта на русском",
-    descEn: "Project description in English...",
-    descRu: "Описание проекта на русском...",
-    media: [
-        // Media items - can be images, videos, or YouTube links
-        {
-            type: "image",
-            src: "media/your-image.png",
-            altEn: "Image description",
-            altRu: "Описание изображения"
-        },
-        {
-            type: "youtube",
-            url: "https://youtu.be/VIDEO_ID",
-            titleEn: "Video Title",
-            titleRu: "Название видео"
-        },
-        {
-            type: "video",
-            src: "media/your-video.mp4",
-            altEn: "Video description",
-            altRu: "Описание видео"
-        }
+    id: 6,
+    categoryEn: "Industrial automation",
+    categoryRu: "Промышленная автоматизация",
+    titleEn: "Project title",
+    titleRu: "Название проекта",
+    subtitleEn: "A short introduction.",
+    subtitleRu: "Краткое введение.",
+    descEn: "What the project does and why it matters.",
+    descRu: "Что делает проект и какую задачу решает.",
+    detailsEn: [
+        { title: "My contribution", text: "Describe your own work." },
+        { title: "How it works", text: "Explain the system and its results." }
     ],
-    tech: ["Technology 1", "Technology 2", "Technology 3"],
-    links: [
-        {
-            type: "github",
-            url: "https://github.com/username/repo",
-            textEn: "GitHub",
-            textRu: "GitHub"
-        },
-        {
-            type: "demo",
-            url: "https://your-demo-url.com",
-            textEn: "Live Demo",
-            textRu: "Демо"
-        },
-        {
-            type: "presentation",
-            url: "https://canva.com/...",
-            textEn: "Presentation",
-            textRu: "Презентация"
-        }
-    ]
-}
-```
-
-## Media Types
-
-### 1. Image
-```javascript
-{
-    type: "image",
-    src: "media/filename.png",  // Path to image file
-    altEn: "Description",
-    altRu: "Описание"
-}
-```
-
-### 2. YouTube Video
-```javascript
-{
-    type: "youtube",
-    url: "https://youtu.be/VIDEO_ID",  // Any YouTube URL format works (including Shorts)
-    titleEn: "Video Title",
-    titleRu: "Название видео"
-}
-```
-
-### 3. Local Video
-```javascript
-{
-    type: "video",
-    src: "media/video.mp4",
-    altEn: "Video description",
-    altRu: "Описание видео"
-}
-```
-
-## Link Types
-
-Supported link types with automatic icons:
-- `github` - GitHub icon
-- `youtube` - YouTube icon
-- `instagram` - Instagram icon
-- `demo` - External link icon
-- `presentation` - Lightbulb icon
-- `documentation` - Book icon
-
-## Carousel Behavior
-
-- **No media**: Project card shows only text content (no carousel)
-- **Single media item**: Shows the item without carousel controls
-- **Multiple media items**: Creates a carousel with:
-  - Previous/Next buttons
-  - Dot indicators
-  - Keyboard navigation (Arrow keys)
-  - Touch/swipe support on mobile
-
-## Examples
-
-### Project with Single Image
-```javascript
-{
-    id: 10,
-    titleEn: "My Project",
-    titleRu: "Мой Проект",
-    descEn: "Description...",
-    descRu: "Описание...",
-    media: [
-        {
-            type: "image",
-            src: "media/project.png",
-            altEn: "Project screenshot",
-            altRu: "Скриншот проекта"
-        }
+    detailsRu: [
+        { title: "Мой вклад", text: "Опишите свою работу." },
+        { title: "Как это работает", text: "Объясните устройство и результаты." }
     ],
-    tech: ["React", "Node.js"],
-    links: [
-        {
-            type: "github",
-            url: "https://github.com/user/repo",
-            textEn: "GitHub",
-            textRu: "GitHub"
-        }
-    ]
-}
-```
-
-### Project with Multiple Media (Carousel)
-```javascript
-{
-    id: 11,
-    titleEn: "Video Project",
-    titleRu: "Видео Проект",
-    descEn: "Description...",
-    descRu: "Описание...",
     media: [
-        {
-            type: "image",
-            src: "media/screenshot1.png",
-            altEn: "Screenshot 1",
-            altRu: "Скриншот 1"
-        },
-        {
-            type: "image",
-            src: "media/screenshot2.png",
-            altEn: "Screenshot 2",
-            altRu: "Скриншот 2"
-        },
-        {
-            type: "youtube",
-            url: "https://youtu.be/abc123",
-            titleEn: "Demo Video",
-            titleRu: "Демо Видео"
-        }
+        { type: "image", src: "media/project/photo.jpg", altEn: "Image description", altRu: "Описание изображения" },
+        { type: "youtube", url: "https://youtu.be/VIDEO_ID", titleEn: "Demonstration", titleRu: "Демонстрация" }
     ],
-    tech: ["Vue.js", "Firebase"],
+    tech: ["Siemens S7-1500", "WinCC"],
     links: [
-        {
-            type: "demo",
-            url: "https://demo.com",
-            textEn: "Live Demo",
-            textRu: "Демо"
-        }
+        { type: "github", url: "https://github.com/USERNAME/REPO", textEn: "GitHub", textRu: "GitHub" }
     ]
 }
 ```
 
-### Project with No Media (Text Only)
-```javascript
-{
-    id: 12,
-    titleEn: "Text Project",
-    titleRu: "Текстовый Проект",
-    descEn: "Description...",
-    descRu: "Описание...",
-    media: [],  // Empty array = no carousel, just text
-    tech: ["Python", "Django"],
-    links: [
-        {
-            type: "github",
-            url: "https://github.com/user/repo",
-            textEn: "GitHub",
-            textRu: "GitHub"
-        }
-    ]
-}
-```
+Put local media under `media/`. In source URLs use forward slashes and match filename case exactly, because GitHub Pages is case-sensitive. Image paths, optional card `cover` paths and local document links must begin with `media/`. External links must use HTTP or HTTPS.
 
-## Tips
+The first image is the card cover by default. Optional `cover`, `coverAltEn` and `coverAltRu` select another cover. `featured: true` gives a project a full-width card; add `contributionLabelEn/Ru` for its contribution line and place the personal-contribution section first in `detailsEn/Ru`. `year` is optional.
 
-1. **Image Optimization**: Compress images before adding them to the `media/` folder
-2. **YouTube URLs**: Any YouTube URL format works (youtu.be, youtube.com, etc.)
-3. **Order Matters**: Media items appear in the order you list them
-4. **Bilingual**: Always provide both English and Russian translations
-5. **Tech Stack**: List technologies used in the project
-6. **Links**: Add relevant links (GitHub, demo, presentation, etc.)
+Cards show a short description and a few technologies. Clicking a card opens the full description, all technologies, gallery and links. `links` is optional; projects without links show a contact option. `github` links are highlighted; other types (such as `document`, `presentation`, `demo`, `youtube`) use the supplied label and an external arrow.
 
-## File Structure
+Gallery types:
 
-```
-portfolio/
-├── projects-data.js      ← Edit this file to add projects
-├── project-generator.js  ← Handles carousel and rendering
-├── main.js               ← Main functionality
-├── index.html            ← HTML structure
-├── styles.css            ← Styling
-└── media/                ← Put images/videos here
-    ├── project1.png
-    ├── project2.jpg
-    └── video.mp4
-```
+- `image`: `src`, `altEn`, `altRu`.
+- `youtube`: `url`, `titleEn`, `titleRu`. Standard watch, embed, Shorts and youtu.be URLs are supported.
+- `video`: local `src`, with `altEn/Ru` or `titleEn/Ru`; native video controls.
+- `audio`: local `src`, with `label` and `labelRu`; native audio controls.
 
-That's it! Just add your project data and it will automatically appear on your portfolio with a carousel if you have multiple media items.
+Photos open at full size. Gallery navigation uses thumbnails, arrow buttons and Left/Right keys. Escape closes the topmost dialog. Videos load when their slide is selected and unload when the slide or project closes.
 
+For team projects keep the repository link, team credits and your own contribution separate. Keep notices supplied with externally sourced assets.

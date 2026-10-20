@@ -1,308 +1,226 @@
-// Chatbot functionality
-// Replace YOUR_WEB_APP_URL with your Google Apps Script Web App URL
+(() => {
+    'use strict';
 
-const CHATBOT_API_URL = 'https://script.google.com/macros/s/AKfycby4TG7mt8FCHo0q6V_jg0Tf-o4gyNAIZXJfGV7v-r7_g7HKJNoWWz75weSHsKOZxlkoHA/exec'
+    const byId = id => document.getElementById(id);
+    const elements = {
+        toggle: byId('chatbotToggle'), panel: byId('chatbotContainer'), messages: byId('chatbotMessages'),
+        form: byId('chatbotForm'), input: byId('chatbotInput'), send: byId('chatbotSend'),
+        stop: byId('chatbotStop'), clear: byId('chatbotClear'), retry: byId('chatbotRetry'),
+        status: byId('chatbotStatus'), mode: byId('chatbotMode'), count: byId('chatbotCount')
+    };
+    if (Object.values(elements).some(element => !element)) return;
 
-let currentLang = localStorage.getItem('preferredLanguage') || 'en';
+    const copy = {
+        en: {
+            guide: 'Portfolio guide', ai: 'AI assistant', you: 'You', notice: 'Service notice',
+            welcome: "Hi! I'm Almat's portfolio assistant. Ask about his projects, technologies or his work on PLC, SCADA and KUKA.",
+            pending: 'Preparing an answer…', cancelled: 'Request cancelled.',
+            empty: 'Type a question first.', tooLong: 'Please keep your question within 1,000 characters.',
+            unavailable: 'AI replies are temporarily unavailable. Here is an answer from the portfolio materials.',
+            limited: 'The AI request limit has been reached. Here is an answer from the portfolio materials.',
+            notConfigured: 'AI replies are not available yet. Here is an answer from the portfolio materials.',
+            timeout: 'The AI service took too long to respond. Here is an answer from the portfolio materials.',
+            sources: 'Related links', diploma: 'Tell me about the graduation project',
+            contribution: 'What was Almat responsible for in the graduation project?',
+            skills: 'What technologies does Almat work with?', contact: 'How can I contact Almat?'
+        },
+        ru: {
+            guide: 'По материалам портфолио', ai: 'ИИ-помощник', you: 'Ты', notice: 'Статус сервиса',
+            welcome: 'Привет! Я помощник по портфолио Алмата. Спроси о проектах, технологиях или его работе с PLC, SCADA и KUKA.',
+            pending: 'Готовлю ответ…', cancelled: 'Запрос отменён.',
+            empty: 'Сначала напиши вопрос.', tooLong: 'Сократи вопрос до 1 000 символов.',
+            unavailable: 'ИИ временно недоступен. Вот ответ по материалам портфолио.',
+            limited: 'Лимит ИИ-запросов исчерпан. Вот ответ по материалам портфолио.',
+            notConfigured: 'ИИ-ответы пока недоступны. Вот ответ по материалам портфолио.',
+            timeout: 'ИИ не успел ответить. Вот ответ по материалам портфолио.',
+            sources: 'Ссылки по теме', diploma: 'Расскажи о дипломном проекте',
+            contribution: 'За что Алмат отвечал в дипломном проекте?',
+            skills: 'С какими технологиями работает Алмат?', contact: 'Как связаться с Алматом?'
+        }
+    };
+    const config = window.PORTFOLIO_ASSISTANT_CONFIG || {};
+    const endpoint = /^https:\/\/script\.google\.com\/macros\/s\/[\w-]+\/exec$/.test(config.endpoint || '') ? config.endpoint : '';
+    const timeoutMs = Number.isFinite(config.timeoutMs) ? Math.max(5000, Math.min(60000, config.timeoutMs)) : 30000;
+    const knowledge = getPortfolioKnowledge_();
+    const allowedLinks = new Set([
+        '#projects', '#about', 'media/Almat_Abdimalik_CV.pdf', 'mailto:' + knowledge.profile.email,
+        ...['github', 'linkedin', 'telegram', 'cv'].map(key => knowledge.profile[key]),
+        ...knowledge.projects.flatMap(project => ['#project-' + project.id, project.portfolioUrl, ...project.links.map(link => link.url)])
+    ]);
+    let language = document.documentElement.lang === 'ru' ? 'ru' : 'en';
+    let mode = endpoint ? 'ai' : 'guide';
+    let history = [];
+    let lastProjectId = null;
+    let pending = null;
+    let requestSequence = 0;
+    let lastFailedQuestion = '';
+    let welcomeElement = null;
 
-// Conversation history storage
-let conversationHistory = [];
+    function visitorId() {
+        let id;
+        try { id = localStorage.getItem('portfolioAssistantVisitorId'); } catch { /* Use a session identifier. */ }
+        if (!/^[A-Za-z0-9][A-Za-z0-9_-]{15,95}$/.test(id || '')) {
+            id = 'visitor_' + (window.crypto?.randomUUID?.() || Date.now().toString(36) + Math.random().toString(36).slice(2) + Math.random().toString(36).slice(2));
+            try { localStorage.setItem('portfolioAssistantVisitorId', id); } catch { /* Keep it in memory. */ }
+        }
+        return id;
+    }
+    const userId = visitorId();
 
-// Generate persistent user ID for rate limiting
-function generateUserId() {
-    const userId = 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-    localStorage.setItem('userId', userId);
-    return userId;
-}
+    function safeHref(raw) {
+        if (!allowedLinks.has(raw)) return null;
+        // Keep known portfolio links on the current preview or published page.
+        if (raw.startsWith('https://almat777.github.io/portfolio/#')) return raw.slice(raw.indexOf('#'));
+        if (raw === knowledge.profile.cv) return 'media/Almat_Abdimalik_CV.pdf';
+        if (/^(https?:\/\/|mailto:|#|media\/)/.test(raw)) return raw;
+        return null;
+    }
 
-// Fetch and store user's public IP (for whitelist checking)
-async function fetchUserIP() {
-    try {
-        // Only fetch if not already stored or if it's been more than 24 hours
-        const lastFetch = localStorage.getItem('ipLastFetch');
-        const now = Date.now();
-        
-        if (!lastFetch || now - parseInt(lastFetch) > 86400000) { // 24 hours
-            const response = await fetch('https://api.ipify.org?format=json');
+    function richText(container, text) {
+        // Only text, emphasis and allow-listed source links. Never inject model HTML.
+        const pattern = /\*\*([^*\n]+)\*\*|\[([^\]\n]+)\]\(([^)\s]+)\)|(https?:\/\/[^\s<>]+)/g;
+        let offset = 0;
+        for (const match of text.matchAll(pattern)) {
+            container.appendChild(document.createTextNode(text.slice(offset, match.index)));
+            if (match[1]) {
+                const strong = document.createElement('strong'); strong.textContent = match[1]; container.appendChild(strong);
+            } else {
+                const url = match[3] || match[4].replace(/[.,;!]+$/, '');
+                const href = safeHref(url);
+                if (href) {
+                    const link = document.createElement('a'); link.textContent = match[2] || url; link.href = href;
+                    if (/^https?:/.test(href)) { link.target = '_blank'; link.rel = 'noopener noreferrer'; }
+                    container.appendChild(link);
+                    if (!match[3]) container.appendChild(document.createTextNode(match[4].slice(url.length)));
+                } else container.appendChild(document.createTextNode(match[0]));
+            }
+            offset = match.index + match[0].length;
+        }
+        container.appendChild(document.createTextNode(text.slice(offset)));
+    }
+
+    function addMessage(text, kind, answerLanguage, sources) {
+        const message = document.createElement('article'); message.className = 'chat-message chat-message-' + kind;
+        const label = document.createElement('p'); label.className = 'chat-message-label'; label.dataset.kind = kind;
+        label.textContent = copy[language][kind];
+        const content = document.createElement('div'); content.className = 'chat-message-text'; content.lang = answerLanguage;
+        richText(content, String(text).slice(0, 6000));
+        message.append(label, content);
+        const validSources = (sources || []).filter(source => safeHref(source.href));
+        if (validSources.length) {
+            const links = document.createElement('div'); links.className = 'chat-message-sources'; links.setAttribute('aria-label', copy[answerLanguage].sources);
+            validSources.forEach(source => {
+                const link = document.createElement('a'); link.textContent = source.label + ' ↗'; link.href = safeHref(source.href);
+                if (/^https?:/.test(link.getAttribute('href'))) { link.target = '_blank'; link.rel = 'noopener noreferrer'; }
+                links.appendChild(link);
+            });
+            message.appendChild(links);
+        }
+        elements.messages.appendChild(message);
+        while (elements.messages.children.length > 40) elements.messages.firstElementChild.remove();
+        elements.messages.scrollTop = elements.messages.scrollHeight;
+        return content;
+    }
+
+    function updateControls() {
+        const busy = Boolean(pending);
+        elements.send.disabled = busy || !elements.input.value.trim();
+        elements.stop.hidden = !busy;
+        elements.retry.hidden = busy || !lastFailedQuestion;
+        elements.form.setAttribute('aria-busy', String(busy));
+        elements.count.textContent = elements.input.value.length + ' / 1000';
+        elements.mode.textContent = copy[language][mode];
+        elements.mode.dataset.mode = mode;
+        elements.status.textContent = busy ? copy[language].pending : '';
+        document.querySelectorAll('[data-chat-question]').forEach(button => { button.disabled = busy; });
+    }
+
+    function reset() {
+        requestSequence++;
+        pending?.abort(); pending = null; history = []; lastProjectId = null; lastFailedQuestion = '';
+        elements.messages.replaceChildren();
+        mode = endpoint ? 'ai' : 'guide';
+        welcomeElement = addMessage(copy[language].welcome, mode, language);
+        elements.input.value = '';
+        updateControls();
+    }
+
+    function portfolioReply(question, answerLanguage) {
+        const reply = getPortfolioGuideAnswer_(question, answerLanguage, lastProjectId);
+        if (reply.projectId) lastProjectId = reply.projectId;
+        mode = 'guide';
+        addMessage(reply.answer, 'guide', answerLanguage, reply.sources);
+    }
+
+    async function submit(question) {
+        if (pending) return;
+        question = String(question || '').trim();
+        if (!question || question.length > 1000) { elements.status.textContent = copy[language][question ? 'tooLong' : 'empty']; return; }
+        const answerLanguage = /[а-яё]/i.test(question) ? 'ru' : language;
+        addMessage(question, 'you', answerLanguage);
+        elements.input.value = '';
+        lastFailedQuestion = '';
+        if (!endpoint) { portfolioReply(question, answerLanguage); updateControls(); return; }
+
+        const sequence = ++requestSequence;
+        const controller = new AbortController(); pending = controller;
+        updateControls();
+        let timedOut = false;
+        const timeout = setTimeout(() => { timedOut = true; controller.abort(); }, timeoutMs);
+        try {
+            const sentHistory = history.slice();
+            const body = new URLSearchParams({ question, language: answerLanguage, history: JSON.stringify(sentHistory), userId });
+            // URL encoding expands Cyrillic text. Bound the actual wire body, keeping recent exchanges.
+            while (body.toString().length > 30000 && sentHistory.length) {
+                sentHistory.splice(0, 2);
+                body.set('history', JSON.stringify(sentHistory));
+            }
+            const response = await fetch(endpoint, { method: 'POST', body, signal: controller.signal, credentials: 'omit', referrerPolicy: 'no-referrer', redirect: 'follow' });
+            if (!response.ok) throw new Error('SERVICE_UNAVAILABLE');
             const data = await response.json();
-            if (data.ip) {
-                localStorage.setItem('userIP', data.ip);
-                localStorage.setItem('ipLastFetch', now.toString());
-                console.log('User public IP stored:', data.ip);
+            if (sequence !== requestSequence) return;
+            if (!data || data.success !== true || typeof data.answer !== 'string' || !data.answer.trim() || data.answer.length > 6000) {
+                throw new Error(typeof data?.code === 'string' ? data.code : 'INVALID_RESPONSE');
             }
+            mode = 'ai';
+            addMessage(data.answer, 'ai', answerLanguage);
+            history.push({ role: 'user', content: question }, { role: 'assistant', content: data.answer.slice(0, 2000) });
+            history = history.slice(-12);
+        } catch (error) {
+            if (sequence !== requestSequence) return;
+            const reason = timedOut ? 'timeout' : error.message === 'NOT_CONFIGURED' ? 'notConfigured' : /LIMIT|RATE_LIMITED/.test(error.message) ? 'limited' : 'unavailable';
+            addMessage(copy[answerLanguage][reason], 'notice', answerLanguage);
+            portfolioReply(question, answerLanguage);
+            lastFailedQuestion = question;
+        } finally {
+            clearTimeout(timeout);
+            if (sequence === requestSequence) { pending = null; updateControls(); }
         }
-    } catch (error) {
-        console.log('Could not fetch IP:', error);
-        // Not critical, just means whitelist by IP won't work
     }
-}
 
-// Track AI chat in analytics
-function trackAIChat(question, answer, responseTime) {
-    // Check if analytics tracking function exists (from your main analytics code)
-    if (typeof window.trackEvent === 'function') {
-        window.trackEvent('ai_chat', {
-            aiQuestion: question,
-            aiAnswer: answer.substring(0, 1000), // Limit to 1000 chars
-            aiResponseTime: responseTime
-        });
-        console.log('✅ AI Chat tracked:', question.substring(0, 50) + '...');
-    } else {
-        console.error('❌ Analytics tracking not available - window.trackEvent not found');
-    }
-}
-
-// Initialize chatbot
-function initChatbot() {
-    // Fetch user's public IP for whitelist checking (non-blocking)
-    fetchUserIP();
-    
-    // Initialize conversation with the welcome message
-    const welcomeMessageEn = "Hello, I'm Almat Abdimalik\nAutomation and Robotics Engineer passionate about PLCs, robotics, and industrial systems engineering.\nAsk my AI any questions about me.";
-    const welcomeMessageRu = "Привет, я Алмат Абдиалик\nИнженер автоматизации и робототехники, увлеченный PLC, роботами и инженерными системами.\nЗадайте моему ИИ любые вопросы обо мне.";
-    
-    // Add welcome message to history (if not already added)
-    if (conversationHistory.length === 0) {
-        conversationHistory.push({
-            role: 'assistant',
-            content: currentLang === 'en' ? welcomeMessageEn : welcomeMessageRu
-        });
-    }
-    const chatbotInput = document.getElementById('chatbotInput');
-    const chatbotInputRu = document.getElementById('chatbotInputRu');
-    const chatbotSend = document.getElementById('chatbotSend');
-    const chatbotMessages = document.getElementById('chatbotMessages');
-    const chatbotLoading = document.getElementById('chatbotLoading');
-    
-    let currentInput = currentLang === 'en' ? chatbotInput : chatbotInputRu;
-    
-    // Update input reference when language changes
-    function updateInputReference() {
-        currentInput = currentLang === 'en' ? chatbotInput : chatbotInputRu;
-        // Hide/show inputs based on language
-        chatbotInput.style.display = currentLang === 'en' ? 'block' : 'none';
-        chatbotInputRu.style.display = currentLang === 'ru' ? 'block' : 'none';
-    }
-    
-    updateInputReference();
-    
-    // Toggle chatbot visibility
-    const chatbotToggle = document.getElementById('chatbotToggle');
-    const chatbotContainer = document.getElementById('chatbotContainer');
-    const chatbotWrapper = chatbotContainer ? chatbotContainer.closest('.chatbot-wrapper') : null;
-    
-    if (chatbotToggle && chatbotContainer && chatbotWrapper) {
-        chatbotToggle.addEventListener('click', function() {
-            const isVisible = chatbotContainer.style.display !== 'none';
-            chatbotContainer.style.display = isVisible ? 'none' : 'block';
-            
-            // Update wrapper class for styling
-            if (isVisible) {
-                chatbotWrapper.classList.remove('expanded');
-            } else {
-                chatbotWrapper.classList.add('expanded');
-            }
-            
-            // Scroll to chatbot when opening
-            if (!isVisible) {
-                setTimeout(() => {
-                    chatbotContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-                }, 100);
-            }
-        });
-    }
-    
-    // Send message function
-    function sendMessage() {
-        const message = currentInput.value.trim();
-        if (!message || chatbotSend.disabled) return;
-        
-        // Add user message to chat
-        addMessage(message, 'user');
-        
-        // Clear input
-        currentInput.value = '';
-        
-        // Disable send button and show loading
-        chatbotSend.disabled = true;
-        chatbotLoading.style.display = 'block';
-        
-        // Scroll to bottom
-        scrollToBottom();
-        
-        // Track start time for analytics
-        const startTime = Date.now();
-        
-        // Send to API with conversation history
-        // Google Apps Script Web Apps handle CORS, but we need to use the right method
-        // Using URL-encoded form data works better with Google Apps Script
-        const formData = new URLSearchParams();
-        formData.append('question', message);
-        formData.append('language', currentLang);
-        formData.append('history', JSON.stringify(conversationHistory));
-        
-        // Add device fingerprint for rate limiting
-        const userId = localStorage.getItem('userId') || generateUserId();
-        formData.append('userId', userId);
-        formData.append('userAgent', navigator.userAgent);
-        formData.append('referrer', window.location.href); // For localhost detection
-        
-        // Try to get public IP for whitelist (optional)
-        const userIP = localStorage.getItem('userIP') || '';
-        if (userIP) {
-            formData.append('userIP', userIP);
-        }
-        
-        fetch(CHATBOT_API_URL, {
-            method: 'POST',
-            mode: 'cors', // Explicitly set CORS mode
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-            },
-            body: formData.toString()
-        })
-        .then(response => {
-            // Google Apps Script returns text, need to parse it
-            return response.text();
-        })
-        .then(text => {
-            // Parse JSON response
-            try {
-                const data = JSON.parse(text);
-                return data;
-            } catch (e) {
-                // Sometimes Google Apps Script wraps the response
-                // Try to extract JSON from the text
-                const jsonMatch = text.match(/\{[\s\S]*\}/);
-                if (jsonMatch) {
-                    return JSON.parse(jsonMatch[0]);
-                }
-                throw new Error('Could not parse response: ' + text.substring(0, 100));
-            }
-        })
-        .then(data => {
-            chatbotLoading.style.display = 'none';
-            chatbotSend.disabled = false;
-            
-            // Calculate response time
-            const responseTime = Date.now() - startTime;
-            
-            // Debug logging
-            console.log('Chatbot response:', data);
-            
-            if (data && data.success) {
-                addMessage(data.answer, 'ai');
-                
-                // Track in analytics
-                trackAIChat(message, data.answer, responseTime);
-                
-                // Add to conversation history
-                conversationHistory.push(
-                    { role: 'user', content: message },
-                    { role: 'assistant', content: data.answer }
-                );
-                
-                // Keep only last 10 exchanges (20 messages) to avoid token limits
-                if (conversationHistory.length > 20) {
-                    conversationHistory = conversationHistory.slice(-20);
-                }
-            } else {
-                // Show user-friendly error message (already translated by backend)
-                const errorMsg = data && data.error 
-                    ? data.error 
-                    : (currentLang === 'en' 
-                        ? 'Sorry, I encountered an error. Please try again later.' 
-                        : 'Извините, произошла ошибка. Пожалуйста, попробуйте позже.');
-                
-                addMessage(errorMsg, 'ai', true);
-                console.error('Chatbot error:', data ? data.error : 'Unknown error', data);
-            }
-            
-            scrollToBottom();
-        })
-        .catch(error => {
-            chatbotLoading.style.display = 'none';
-            chatbotSend.disabled = false;
-            addMessage(
-                currentLang === 'en' 
-                    ? 'Sorry, I couldn\'t connect to the server. Please check your connection.' 
-                    : 'Извините, не удалось подключиться к серверу. Проверьте подключение.',
-                'ai',
-                true
-            );
-            console.error('Chatbot fetch error:', error);
-            scrollToBottom();
-        });
-    }
-    
-    // Add message to chat
-    function addMessage(text, type, isError = false) {
-        const messageDiv = document.createElement('div');
-        messageDiv.className = `message ${type}-message`;
-        
-        if (isError) {
-            messageDiv.style.opacity = '0.7';
-        }
-        
-        const avatar = document.createElement('div');
-        avatar.className = 'message-avatar';
-        
-        if (type === 'ai') {
-            avatar.innerHTML = '<i class="fas fa-robot"></i>';
-        } else {
-            avatar.innerHTML = '<i class="fas fa-user"></i>';
-        }
-        
-        const content = document.createElement('div');
-        content.className = 'message-content';
-        const p = document.createElement('p');
-        p.textContent = text;
-        content.appendChild(p);
-        
-        messageDiv.appendChild(avatar);
-        messageDiv.appendChild(content);
-        
-        chatbotMessages.appendChild(messageDiv);
-        scrollToBottom();
-    }
-    
-    // Scroll to bottom
-    function scrollToBottom() {
-        chatbotMessages.scrollTop = chatbotMessages.scrollHeight;
-    }
-    
-    // Event listeners
-    chatbotSend.addEventListener('click', sendMessage);
-    
-    chatbotInput.addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') {
-            sendMessage();
-        }
+    elements.toggle.addEventListener('click', () => {
+        elements.panel.hidden = !elements.panel.hidden;
+        elements.toggle.setAttribute('aria-expanded', String(!elements.panel.hidden));
+        elements.toggle.querySelector('.toggle-icon').textContent = elements.panel.hidden ? '+' : '−';
+        if (!elements.panel.hidden) elements.input.focus({ preventScroll: true });
     });
-    
-    chatbotInputRu.addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') {
-            sendMessage();
-        }
+    elements.form.addEventListener('submit', event => { event.preventDefault(); submit(elements.input.value); });
+    elements.input.addEventListener('input', updateControls);
+    elements.input.addEventListener('keydown', event => {
+        if (event.key === 'Enter' && !event.shiftKey && !event.isComposing) { event.preventDefault(); submit(elements.input.value); }
     });
-    
-    // Update input when language changes
-    const langToggle = document.getElementById('langToggle');
-    if (langToggle) {
-        const originalClick = langToggle.onclick;
-        langToggle.addEventListener('click', function() {
-            setTimeout(() => {
-                currentLang = localStorage.getItem('preferredLanguage') || 'en';
-                updateInputReference();
-            }, 100);
-        });
-    }
-}
-
-// Initialize when DOM is ready
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initChatbot);
-} else {
-    initChatbot();
-}
-
+    elements.stop.addEventListener('click', () => {
+        requestSequence++; pending?.abort(); pending = null;
+        addMessage(copy[language].cancelled, 'notice', language); updateControls(); elements.input.focus();
+    });
+    elements.clear.addEventListener('click', () => { reset(); elements.input.focus(); });
+    elements.retry.addEventListener('click', () => { if (lastFailedQuestion) submit(lastFailedQuestion); });
+    document.querySelectorAll('[data-chat-question]').forEach(button => button.addEventListener('click', () => submit(copy[language][button.dataset.chatQuestion])));
+    document.addEventListener('portfolio:languagechange', event => {
+        language = event.detail.language === 'ru' ? 'ru' : 'en';
+        document.querySelectorAll('.chat-message-label').forEach(label => { label.textContent = copy[language][label.dataset.kind]; });
+        if (welcomeElement?.isConnected) { welcomeElement.textContent = copy[language].welcome; welcomeElement.lang = language; }
+        updateControls();
+    });
+    reset();
+})();

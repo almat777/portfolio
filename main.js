@@ -1,827 +1,165 @@
-
-        document.addEventListener('DOMContentLoaded', function() {
-            // Initialize projects
-            const projectContainer = document.getElementById('projectCardsContainer');
-            let currentLang = localStorage.getItem('preferredLanguage') || 'en';
-            
-            // Global reference to setupLightboxHandlers (will be set later)
-            let setupLightboxHandlers = null;
-            
-            // Render projects on page load
-            if (typeof projectsData !== 'undefined' && projectContainer) {
-                renderProjects(projectsData, currentLang, projectContainer);
-            }
-            
-            // Mobile navigation toggle
-            const hamburger = document.getElementById('hamburger');
-            const navLinks = document.getElementById('navLinks');
-            
-            if (hamburger && navLinks) {
-                hamburger.addEventListener('click', function(e) {
-                    console.log('Hamburger clicked');
-                    e.stopPropagation();
-                    navLinks.classList.toggle('active');
-                    this.innerHTML = navLinks.classList.contains('active') 
-                        ? '<i class="fas fa-times"></i>' 
-                        : '<i class="fas fa-bars"></i>';
-                    console.log('Nav menu toggled, active:', navLinks.classList.contains('active'));
-                });
-                
-                // Close menu when clicking outside
-                document.addEventListener('click', function(e) {
-                    if (navLinks.classList.contains('active') && 
-                        !navLinks.contains(e.target) && 
-                        e.target !== hamburger && 
-                        !hamburger.contains(e.target)) {
-                        navLinks.classList.remove('active');
-                        hamburger.innerHTML = '<i class="fas fa-bars"></i>';
-                    }
-                });
-                
-                // Smooth scrolling for navigation links
-                document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-                    anchor.addEventListener('click', function(e) {
-                        e.preventDefault();
-                        
-                        // Close mobile menu if open
-                        if (navLinks.classList.contains('active')) {
-                            navLinks.classList.remove('active');
-                            hamburger.innerHTML = '<i class="fas fa-bars"></i>';
-                        }
-                        
-                        const targetId = this.getAttribute('href');
-                        if (targetId === '#') return;
-                        
-                        const targetElement = document.querySelector(targetId);
-                        if (targetElement) {
-                            window.scrollTo({
-                                top: targetElement.offsetTop - 80,
-                                behavior: 'smooth'
-                            });
-                        }
-                    });
-                });
-            }
-            
-            // Better touch experience for projects
-            if ('ontouchstart' in window || navigator.maxTouchPoints) {
-                document.querySelectorAll('.project-card').forEach(card => {
-                    card.classList.add('touch-device');
-                    
-                    // Optional: Add tap highlight animation for mobile
-                    card.addEventListener('touchstart', function() {
-                        this.classList.add('touch-active');
-                    });
-                    
-                    card.addEventListener('touchend', function() {
-                        this.classList.remove('touch-active');
-                    });
-                });
-            }
-
-            // Language Switcher Functionality
-            const langToggle = document.getElementById('langToggle');
-            const langText = langToggle.querySelector('.lang-text');
-            
-            // Update button text based on current language
-            langText.textContent = currentLang.toUpperCase();
-
-            langToggle.addEventListener('click', function() {
-                // Toggle language
-                currentLang = currentLang === 'en' ? 'ru' : 'en';
-                
-                // Update button text
-                langText.textContent = currentLang.toUpperCase();
-                
-                // Re-render projects with new language
-                if (typeof projectsData !== 'undefined' && projectContainer) {
-                    renderProjects(projectsData, currentLang, projectContainer);
-                    
-                    // Re-setup lightbox handlers after re-render
-                    setTimeout(() => {
-                        if (setupLightboxHandlers !== null && typeof setupLightboxHandlers === 'function') {
-                            setupLightboxHandlers();
-                        }
-                    }, 100);
-                }
-                
-                // Show/hide static elements based on language
-                document.querySelectorAll('.lang-en').forEach(el => {
-                    el.style.display = currentLang === 'en' ? '' : 'none';
-                });
-                
-                document.querySelectorAll('.lang-ru').forEach(el => {
-                    el.style.display = currentLang === 'ru' ? '' : 'none';
-                });
-                
-                // Fix for specific elements with different display types
-                document.querySelectorAll('.nav-links a').forEach(link => {
-                    if (link.classList.contains('lang-' + currentLang)) {
-                        link.style.display = 'block';
-                    } else {
-                        link.style.display = 'none';
-                    }
-                });
-
-                // Fix for buttons that should be inline-block
-                document.querySelectorAll('.btn.lang-' + currentLang).forEach(btn => {
-                    btn.style.display = 'inline-block';
-                });
-
-                // Fix for CV container
-                document.querySelectorAll('.cv-container').forEach(container => {
-                    if (container.classList.contains('lang-' + currentLang)) {
-                        container.style.display = 'block';
-                    } else {
-                        container.style.display = 'none';
-                    }
-                });
-
-                // Update current search input reference
-                currentSearchInput = currentLang === 'en' ? searchInputEn : searchInputRu;
-
-                // Clear search and highlights when switching language
-                if (currentSearchInput) {
-                    currentSearchInput.value = '';
-                    if (typeof removeHighlights === 'function') {
-                        removeHighlights();
-                    }
-                    if (typeof clearButton !== 'undefined' && clearButton) {
-                        clearButton.style.display = 'none';
-                    }
-                    if (typeof performSearch === 'function') {
-                        performSearch();
-                    }
-                }
-
-                // Remember the user's language preference
-                localStorage.setItem('preferredLanguage', currentLang);
-            });
-
-            // Check for saved language preference and apply it
-            if (currentLang !== 'en') {
-                // Apply saved language preference
-                langText.textContent = currentLang.toUpperCase();
-                document.querySelectorAll('.lang-en').forEach(el => {
-                    el.style.display = 'none';
-                });
-                document.querySelectorAll('.lang-ru').forEach(el => {
-                    el.style.display = '';
-                });
-            }
-
-            // Simple search with visual feedback
-            let projectCards = document.querySelectorAll('.project-card');
-            const searchInputEn = document.getElementById('projectSearch');
-            const searchInputRu = document.getElementById('projectSearchRu');
-            const clearButton = document.getElementById('clearSearch');
-            const searchInfo = document.getElementById('searchInfo');
-            const noResultsElement = document.getElementById('noResults');
-            
-            let currentSearchInput = currentLang === 'en' ? searchInputEn : searchInputRu;
-            
-            // Function to refresh project cards reference
-            function refreshProjectCards() {
-                projectCards = document.querySelectorAll('.project-card');
-            }
-
-            // Function to highlight matching text
-            function highlightText(element, searchTerm) {
-                if (!searchTerm || searchTerm.length < 2) return;
-                
-                const text = element.textContent;
-                const regex = new RegExp(`(${searchTerm})`, 'gi');
-                
-                if (regex.test(text)) {
-                    element.innerHTML = text.replace(regex, '<span class="highlight">$1</span>');
-                }
-            }
-
-            // Function to remove highlights
-            function removeHighlights() {
-                document.querySelectorAll('.highlight').forEach(highlight => {
-                    const parent = highlight.parentNode;
-                    parent.replaceChild(document.createTextNode(highlight.textContent), highlight);
-                    parent.normalize();
-                });
-            }
-
-            // Update search info display
-            function updateSearchInfo(searchTerm, visibleCount, totalCount) {
-                const infoEn = searchInfo.querySelector('.lang-en');
-                const infoRu = searchInfo.querySelector('.lang-ru');
-                
-                if (!searchTerm || searchTerm.trim() === '') {
-                    infoEn.textContent = 'All projects shown';
-                    infoRu.textContent = 'Показаны все проекты';
-                    searchInfo.style.backgroundColor = 'rgba(66, 133, 244, 0.1)';
-                } else if (visibleCount === 0) {
-                    infoEn.textContent = `No projects found for "${searchTerm}"`;
-                    infoRu.textContent = `Не найдено проектов для "${searchTerm}"`;
-                    searchInfo.style.backgroundColor = 'rgba(255, 99, 71, 0.1)';
-                } else if (visibleCount === totalCount) {
-                    infoEn.textContent = `All projects match "${searchTerm}"`;
-                    infoRu.textContent = `Все проекты соответствуют "${searchTerm}"`;
-                    searchInfo.style.backgroundColor = 'rgba(76, 175, 80, 0.1)';
-                } else {
-                    infoEn.textContent = `${visibleCount} of ${totalCount} projects found`;
-                    infoRu.textContent = `Найдено ${visibleCount} из ${totalCount} проектов`;
-                    searchInfo.style.backgroundColor = 'rgba(66, 133, 244, 0.1)';
-                }
-            }
-
-            // Main search function
-            function performSearch() {
-                refreshProjectCards(); // Refresh reference to project cards
-                const searchTerm = currentSearchInput.value.toLowerCase().trim();
-                let visibleCount = 0;
-                const totalCount = projectCards.length;
-
-                // Remove previous highlights
-                removeHighlights();
-
-                // Show/hide clear button
-                if (clearButton) {
-                    clearButton.style.display = searchTerm ? 'flex' : 'none';
-                }
-
-                projectCards.forEach(card => {
-                    let matches = false;
-
-                    if (searchTerm === '') {
-                        matches = true;
-                    } else {
-                        // Get visible elements based on current language
-                        const titleElement = card.querySelector(`.project-title.lang-${currentLang}`);
-                        const descriptionElement = card.querySelector(`.project-description.lang-${currentLang}`);
-                        const techElements = card.querySelectorAll('.tech-tag');
-
-                        // Check matches
-                        const title = titleElement ? titleElement.textContent.toLowerCase() : '';
-                        const description = descriptionElement ? descriptionElement.textContent.toLowerCase() : '';
-                        const techStack = Array.from(techElements).map(tag => tag.textContent.toLowerCase());
-
-                        matches = title.includes(searchTerm) || 
-                                 description.includes(searchTerm) || 
-                                 techStack.some(tech => tech.includes(searchTerm));
-
-                        // Add highlights for matches
-                        if (matches && searchTerm.length >= 2) {
-                            if (titleElement && title.includes(searchTerm)) {
-                                highlightText(titleElement, searchTerm);
-                            }
-                            if (descriptionElement && description.includes(searchTerm)) {
-                                highlightText(descriptionElement, searchTerm);
-                            }
-                            techElements.forEach(techElement => {
-                                if (techElement.textContent.toLowerCase().includes(searchTerm)) {
-                                    highlightText(techElement, searchTerm);
-                                }
-                            });
-                        }
-                    }
-
-                    // Show/hide project with smooth animation
-                    if (matches) {
-                        card.classList.remove('hidden');
-                        visibleCount++;
-                    } else {
-                        card.classList.add('hidden');
-                    }
-                });
-
-                // Update search info
-                if (searchInfo) {
-                    updateSearchInfo(searchTerm, visibleCount, totalCount);
-                }
-
-                // Show/hide no results message
-                if (noResultsElement) {
-                    if (visibleCount === 0 && searchTerm !== '') {
-                        noResultsElement.style.display = 'block';
-                    } else {
-                        noResultsElement.style.display = 'none';
-                    }
-                }
-            }
-
-            // Clear search function
-            function clearSearch() {
-                currentSearchInput.value = '';
-                removeHighlights();
-                clearButton.style.display = 'none';
-                performSearch();
-                currentSearchInput.focus();
-            }
-
-            // Setup search input event listeners
-            function setupSearchInput(input) {
-                if (!input) return;
-
-                input.addEventListener('input', performSearch);
-                
-                input.addEventListener('keydown', function(e) {
-                    if (e.key === 'Escape') {
-                        clearSearch();
-                    }
-                });
-            }
-
-            // Setup clear button
-            if (clearButton) {
-                clearButton.addEventListener('click', clearSearch);
-            }
-
-            // Initialize search inputs
-            setupSearchInput(searchInputEn);
-            setupSearchInput(searchInputRu);
-
-            // Initial load - wait for projects to be rendered
-            setTimeout(() => {
-                refreshProjectCards();
-                if (searchInfo) {
-                    updateSearchInfo('', projectCards.length, projectCards.length);
-                }
-            }, 100);
-
-            // === ANALYTICS SYSTEM ===
-            
-            // Configuration
-            const ANALYTICS_URL = 'https://script.google.com/macros/s/AKfycbwYuMFiIcMYotbATQVOp1Gc1dUgtNnrw6rLlSsVF04NXw8mMXhibR3UYAotxOnX3YBilA/exec';
-            
-            // Generate or retrieve unique user ID
-            function getUserId() {
-                let userId = localStorage.getItem('portfolioUserId');
-                if (!userId) {
-                    userId = 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-                    localStorage.setItem('portfolioUserId', userId);
-                }
-                return userId;
-            }
-
-            // Get session ID (changes each visit)
-            function getSessionId() {
-                let sessionId = sessionStorage.getItem('portfolioSessionId');
-                if (!sessionId) {
-                    sessionId = 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-                    sessionStorage.setItem('portfolioSessionId', sessionId);
-                }
-                return sessionId;
-            }
-
-            // Get Almaty time (UTC+5)
-            function getAlmatyTime() {
-                const now = new Date();
-                const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
-                const almatyTime = new Date(utc + (5 * 3600000)); // UTC+5
-                return almatyTime.toISOString().replace('T', ' ').slice(0, 19) + ' (UTC+5)';
-            }
-
-            // Get essential device info only
-            function getEssentialDeviceInfo() {
-                return {
-                    devicePlatform: navigator.platform,
-                    deviceType: /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ? 'Mobile' : 'Desktop',
-                    screenSize: screen.width + 'x' + screen.height,
-                    browserLanguage: navigator.language,
-                    referrer: document.referrer || 'direct'
-                };
-            }
-
-            // Track session start time
-            let sessionStartTime = Date.now();
-            let pageStartTime = Date.now();
-
-            // Main function to send analytics data
-            function trackEvent(eventType, eventData = {}) {
-                const deviceInfo = getEssentialDeviceInfo();
-                
-                const data = {
-                    // Basic info
-                    timestamp: getAlmatyTime(),
-                    userId: getUserId(),
-                    sessionId: getSessionId(),
-                    eventType: eventType,
-                    
-                    // Page context
-                    currentLanguage: currentLang,
-                    
-                    // Device info (only essential)
-                    devicePlatform: deviceInfo.devicePlatform,
-                    deviceType: deviceInfo.deviceType,
-                    screenSize: deviceInfo.screenSize,
-                    browserLanguage: deviceInfo.browserLanguage,
-                    referrer: deviceInfo.referrer,
-                    
-                    // Time tracking
-                    timeOnPageSeconds: Math.round((Date.now() - pageStartTime) / 1000),
-                    totalSessionSeconds: Math.round((Date.now() - sessionStartTime) / 1000),
-                    
-                    // Event specific data
-                    ...eventData
-                };
-
-                // Send to Google Sheets
-                fetch(ANALYTICS_URL, {
-                    method: 'POST',
-                    mode: 'no-cors',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(data)
-                }).catch(error => {
-                    console.log('Analytics tracking failed:', error);
-                });
-                
-                // Debug log
-                console.log('📊 Event tracked:', eventType, eventData);
-            }
-            
-            // Make trackEvent globally accessible for chatbot
-            window.trackEvent = trackEvent;
-
-            // Track page load - wait for projects to be rendered
-            setTimeout(() => {
-                refreshProjectCards();
-                trackEvent('page_load', {
-                    totalProjects: projectCards.length,
-                    loadTimeMs: performance.now()
-                });
-            }, 100);
-
-            // Track language switches
-            langToggle.addEventListener('click', function(e) {
-                trackEvent('language_switch', {
-                    fromLanguage: currentLang,
-                    toLanguage: currentLang === 'en' ? 'ru' : 'en'
-                });
-            });
-
-            // Track all clicks with proper categorization
-            document.addEventListener('click', function(e) {
-                const target = e.target.closest('a, button');
-                if (!target) return;
-
-                const href = target.href || '';
-                const buttonText = target.textContent.trim();
-
-                // Social media clicks
-                if (href.includes('linkedin.com')) {
-                    trackEvent('social_click', { socialPlatform: 'linkedin', buttonText: buttonText });
-                } else if (href.includes('instagram.com')) {
-                    trackEvent('social_click', { socialPlatform: 'instagram', buttonText: buttonText });
-                } else if (href.includes('t.me')) {
-                    trackEvent('social_click', { socialPlatform: 'telegram', buttonText: buttonText });
-                } else if (href.includes('github.com')) {
-                    trackEvent('social_click', { socialPlatform: 'github', buttonText: buttonText });
-                    
-                // CV downloads
-                } else if (href.includes('.pdf')) {
-                    trackEvent('cv_download', { 
-                        language: currentLang, 
-                        filename: href.split('/').pop(),
-                        buttonText: buttonText
-                    });
-                    
-                // Presentation clicks
-                } else if (href.includes('canva.com')) {
-                    trackEvent('presentation_click', { 
-                        buttonText: buttonText,
-                        language: currentLang
-                    });
-                    
-                // Navigation clicks
-                } else if (href.startsWith('#')) {
-                    trackEvent('navigation_click', { 
-                        section: href.replace('#', ''),
-                        buttonText: buttonText
-                    });
-                    
-                // Other buttons
-                } else if (target.classList.contains('btn') || target.tagName === 'BUTTON') {
-                    trackEvent('button_click', { 
-                        buttonText: buttonText,
-                        buttonType: target.className
-                    });
-                }
-                
-                // Special case for clear search
-                if (target.id === 'clearSearch') {
-                    trackEvent('search_clear');
-                }
-            });
-
-            // Track search behavior (fixed)
-            let searchTimeout;
-            function trackSearchEvent() {
-                clearTimeout(searchTimeout);
-                searchTimeout = setTimeout(() => {
-                    const searchTerm = currentSearchInput.value.trim();
-                    if (searchTerm.length > 0) {
-                        const visibleProjects = document.querySelectorAll('.project-card:not(.hidden)').length;
-                        trackEvent('search_performed', {
-                            searchTerm: searchTerm,
-                            resultsFound: visibleProjects,
-                            language: currentLang
-                        });
-                    }
-                }, 1500); // Wait 1.5 seconds after user stops typing
-            }
-
-            // Add search tracking to both inputs
-            if (searchInputEn) {
-                searchInputEn.addEventListener('input', trackSearchEvent);
-            }
-            if (searchInputRu) {
-                searchInputRu.addEventListener('input', trackSearchEvent);
-            }
-
-            // Track email/phone copy attempts
-            document.addEventListener('copy', function(e) {
-                const selection = window.getSelection().toString();
-                if (selection.includes('almatinow@gmail.com')) {
-                    trackEvent('contact_copy', { contactType: 'email', contactValue: 'almatinow@gmail.com' });
-                } else if (selection.includes('+7 707 446 6793')) {
-                    trackEvent('contact_copy', { contactType: 'phone', contactValue: '+7 708 169 5426' });
-                }
-            });
-
-            // Track project views and clicks - setup after projects are rendered
-            function setupProjectTracking() {
-                refreshProjectCards();
-                projectCards.forEach((card, index) => {
-                    const titleElement = card.querySelector(`.project-title.lang-${currentLang}`);
-                    if (!titleElement) return;
-                    
-                    const projectTitle = titleElement.textContent.trim();
-                    
-                    // Track when project comes into view
-                    const observer = new IntersectionObserver((entries) => {
-                        entries.forEach(entry => {
-                            if (entry.isIntersecting) {
-                                trackEvent('project_view', {
-                                    projectTitle: projectTitle,
-                                    projectIndex: index + 1,
-                                    language: currentLang
-                                });
-                                observer.unobserve(entry.target);
-                            }
-                        });
-                    }, { threshold: 0.6 });
-                    
-                    observer.observe(card);
-
-                    // Track project card clicks (not links)
-                    card.addEventListener('click', function(e) {
-                        if (!e.target.closest('a')) {
-                            trackEvent('project_click', {
-                                projectTitle: projectTitle,
-                                projectIndex: index + 1,
-                                language: currentLang
-                            });
-                        }
-                    });
-                });
-            }
-            
-            // Setup tracking after initial render
-            setTimeout(setupProjectTracking, 100);
-
-            // Track CV iframe views
-            const cvIframes = document.querySelectorAll('.cv-container iframe');
-            cvIframes.forEach(iframe => {
-                iframe.addEventListener('load', function() {
-                    trackEvent('cv_view', { language: currentLang });
-                });
-            });
-
-            // Track page visibility changes
-            document.addEventListener('visibilitychange', function() {
-                if (document.hidden) {
-                    trackEvent('page_blur', {
-                        timeBeforeBlurSeconds: Math.round((Date.now() - pageStartTime) / 1000)
-                    });
-                } else {
-                    pageStartTime = Date.now(); // Reset page timer
-                    trackEvent('page_focus');
-                }
-            });
-
-            // Track when user leaves page
-            window.addEventListener('beforeunload', function() {
-                trackEvent('session_end', {
-                    totalSessionTimeSeconds: Math.round((Date.now() - sessionStartTime) / 1000),
-                    finalTimeOnPageSeconds: Math.round((Date.now() - pageStartTime) / 1000)
-                });
-            });
-
-            // Track scroll milestones
-            let maxScrollDepth = 0;
-            window.addEventListener('scroll', function() {
-                const scrollDepth = Math.round((window.scrollY / (document.body.scrollHeight - window.innerHeight)) * 100);
-                if (scrollDepth > maxScrollDepth) {
-                    maxScrollDepth = scrollDepth;
-                    // Only track major milestones
-                    if ([25, 50, 75, 100].includes(maxScrollDepth)) {
-                        trackEvent('scroll_milestone', { scrollDepth: maxScrollDepth });
-                    }
-                }
-            });
-
-            // === LIGHTBOX FUNCTIONALITY ===
-            
-            // Check if device is mobile
-            const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth <= 768;
-            
-            // Only initialize lightbox on desktop devices
-            if (!isMobile) {
-                const lightbox = document.getElementById('lightbox');
-                const lightboxImage = document.getElementById('lightboxImage');
-                const lightboxTitle = document.getElementById('lightboxTitle');
-                const lightboxClose = document.getElementById('lightboxClose');
-                const lightboxPrev = document.getElementById('lightboxPrev');
-                const lightboxNext = document.getElementById('lightboxNext');
-                const lightboxCounter = document.getElementById('lightboxCounter');
-
-                // Variables to track current lightbox state
-                let currentImages = [];
-                let currentIndex = 0;
-                let currentProjectTitle = '';
-
-                // Function to update lightbox image
-                function updateLightboxImage(index) {
-                    if (index < 0 || index >= currentImages.length) return;
-                    
-                    currentIndex = index;
-                    const imageData = currentImages[index];
-                    
-                    lightboxImage.src = imageData.src;
-                    lightboxImage.alt = imageData.alt;
-                    lightboxImage.style.display = 'block';
-                    
-                    // Update counter if multiple images
-                    if (currentImages.length > 1) {
-                        lightboxCounter.textContent = `${currentIndex + 1} / ${currentImages.length}`;
-                        lightboxCounter.style.display = 'block';
-                        
-                        // Show/hide navigation buttons
-                        lightboxPrev.style.display = currentIndex > 0 ? 'flex' : 'none';
-                        lightboxNext.style.display = currentIndex < currentImages.length - 1 ? 'flex' : 'none';
-                    } else {
-                        lightboxCounter.style.display = 'none';
-                        lightboxPrev.style.display = 'none';
-                        lightboxNext.style.display = 'none';
-                    }
-
-                    // Track lightbox view
-                    trackEvent('image_lightbox_view', {
-                        imageName: imageData.src.split('/').pop(),
-                        imageIndex: currentIndex + 1,
-                        totalImages: currentImages.length,
-                        projectTitle: currentProjectTitle,
-                        language: currentLang
-                    });
-                }
-
-                // Function to open lightbox
-                function openLightbox(images, startIndex, projectTitle) {
-                    currentImages = images;
-                    currentIndex = startIndex;
-                    currentProjectTitle = projectTitle;
-                    
-                    lightboxTitle.textContent = projectTitle;
-                    
-                    // Prevent body scroll
-                    document.body.style.overflow = 'hidden';
-                    
-                    // Show lightbox with animation
-                    lightbox.style.display = 'flex';
-                    requestAnimationFrame(() => {
-                        lightbox.classList.add('active');
-                        updateLightboxImage(currentIndex);
-                    });
-
-                    // Track lightbox open
-                    trackEvent('image_lightbox_open', {
-                        projectTitle: projectTitle,
-                        totalImages: images.length,
-                        language: currentLang
-                    });
-                }
-
-                // Function to close lightbox
-                function closeLightbox() {
-                    lightbox.classList.remove('active');
-                    document.body.style.overflow = '';
-                    
-                    setTimeout(() => {
-                        lightbox.style.display = 'none';
-                        lightboxImage.src = '#';
-                        lightboxImage.style.display = 'none';
-                        lightboxCounter.style.display = 'none';
-                        lightboxPrev.style.display = 'none';
-                        lightboxNext.style.display = 'none';
-                        currentImages = [];
-                        currentIndex = 0;
-                    }, 300);
-
-                    trackEvent('image_lightbox_close');
-                }
-
-                // Navigation functions
-                function showPreviousImage() {
-                    if (currentIndex > 0) {
-                        updateLightboxImage(currentIndex - 1);
-                    }
-                }
-
-                function showNextImage() {
-                    if (currentIndex < currentImages.length - 1) {
-                        updateLightboxImage(currentIndex + 1);
-                    }
-                }
-
-                // Function to setup lightbox for project images
-                setupLightboxHandlers = function() {
-                    document.querySelectorAll('.project-card').forEach(projectCard => {
-                        // Get project title
-                        const titleElement = projectCard.querySelector(`.project-title.lang-${currentLang}`);
-                        const projectTitle = titleElement ? titleElement.textContent.trim() : '';
-                        
-                        // Collect all images from this project
-                        const projectImages = [];
-                        projectCard.querySelectorAll('.project-media img').forEach(img => {
-                            projectImages.push({
-                                src: img.src,
-                                alt: img.alt
-                            });
-                        });
-                        
-                        // Add click handler to each image
-                        projectCard.querySelectorAll('.project-media img').forEach((img, index) => {
-                            // Remove existing listeners to avoid duplicates
-                            const newImg = img.cloneNode(true);
-                            img.parentNode.replaceChild(newImg, img);
-                            
-                            newImg.addEventListener('click', function(e) {
-                                e.stopPropagation();
-                                openLightbox(projectImages, index, projectTitle);
-                            });
-                        });
-                    });
-                };
-                
-                // Setup lightbox handlers after projects are rendered
-                setTimeout(setupLightboxHandlers, 100);
-                
-                // Re-setup when language changes - handled in language toggle
-
-                // Close lightbox when clicking close button
-                lightboxClose.addEventListener('click', function(e) {
-                    e.stopPropagation();
-                    closeLightbox();
-                });
-
-                // Previous image button
-                lightboxPrev.addEventListener('click', function(e) {
-                    e.stopPropagation();
-                    showPreviousImage();
-                });
-
-                // Next image button
-                lightboxNext.addEventListener('click', function(e) {
-                    e.stopPropagation();
-                    showNextImage();
-                });
-
-                // Close lightbox when clicking outside the image
-                lightbox.addEventListener('click', function(e) {
-                    if (e.target === lightbox) {
-                        closeLightbox();
-                    }
-                });
-
-                // Keyboard navigation
-                document.addEventListener('keydown', function(e) {
-                    if (lightbox.classList.contains('active')) {
-                        if (e.key === 'Escape') {
-                            closeLightbox();
-                        } else if (e.key === 'ArrowLeft') {
-                            showPreviousImage();
-                        } else if (e.key === 'ArrowRight') {
-                            showNextImage();
-                        }
-                    }
-                });
-
-                // Prevent lightbox content clicks from closing
-                document.querySelector('.lightbox-content').addEventListener('click', function(e) {
-                    e.stopPropagation();
-                });
-            } else {
-                // On mobile devices, remove cursor pointer and hover effects from images
-                document.querySelectorAll('.project-media img').forEach(img => {
-                    img.style.cursor = 'default';
-                });
-            }
-        });
+(() => {
+    'use strict';
+    const byId = id => document.getElementById(id);
+    let language = 'en';
+    try { language = localStorage.getItem('preferredLanguage') === 'ru' ? 'ru' : 'en'; } catch { /* Storage may be unavailable. */ }
+    let activeProject = null;
+    let slideIndex = 0;
+    let projectOpener = null;
+    let projectHash = '';
+    const projectDialog = byId('projectDialog');
+    const imageDialog = byId('imageDialog');
+    const search = byId('projectSearch');
+    const menuToggle = byId('hamburger');
+    const menu = byId('navLinks');
+
+    function setMenu(open) {
+        menu.classList.toggle('active', open);
+        menuToggle.setAttribute('aria-expanded', String(open));
+        menuToggle.setAttribute('aria-label', language === 'ru' ? (open ? 'Закрыть меню' : 'Открыть меню') : (open ? 'Close navigation' : 'Open navigation'));
+    }
+
+    function updateProjects() {
+        const query = search.value.trim().toLocaleLowerCase();
+        const filtered = projectsData.filter(project => [project.titleEn, project.titleRu, project.descEn, project.descRu, project.categoryEn, project.categoryRu, ...(project.tech || [])].join(' ').toLocaleLowerCase().includes(query));
+        renderProjects(filtered, language, byId('projectCardsContainer'));
+        byId('noResults').hidden = filtered.length > 0;
+        byId('clearSearch').hidden = !search.value;
+        byId('projectCount').textContent = `${String(filtered.length).padStart(2, '0')} / ${String(projectsData.length).padStart(2, '0')}`;
+        byId('searchInfo').textContent = language === 'ru' ? `Показано проектов: ${filtered.length} из ${projectsData.length}` : `${filtered.length} of ${projectsData.length} projects shown`;
+    }
+
+    function translatePage() {
+        document.documentElement.lang = language;
+        document.title = language === 'ru' ? 'Алмат Абдималик — Автоматизация и робототехника' : 'Almat Abdimalik — Automation & Robotics';
+        document.querySelectorAll('[data-en][data-ru]').forEach(element => { element.textContent = element.dataset[language]; });
+        document.querySelectorAll('[data-placeholder-en]').forEach(element => { element.placeholder = element.getAttribute(`data-placeholder-${language}`); });
+        document.querySelectorAll('[data-label-en]').forEach(element => { element.setAttribute('aria-label', element.getAttribute(`data-label-${language}`)); });
+        document.querySelectorAll('[data-alt-en]').forEach(element => { element.alt = element.getAttribute(`data-alt-${language}`); });
+        const languageLabel = language === 'ru' ? 'Switch to English' : 'Переключить на русский';
+        byId('langToggle').setAttribute('aria-label', languageLabel);
+        byId('projectLanguageToggle').setAttribute('aria-label', languageLabel);
+        byId('projectLanguageToggle').textContent = language === 'ru' ? 'RU → EN' : 'EN → RU';
+        setMenu(menu.classList.contains('active'));
+        updateProjects();
+        if (activeProject) renderDetail();
+        document.dispatchEvent(new CustomEvent('portfolio:languagechange', { detail: { language } }));
+    }
+
+    function toggleLanguage() {
+        language = language === 'en' ? 'ru' : 'en';
+        try { localStorage.setItem('preferredLanguage', language); } catch { /* Keep the choice for this visit. */ }
+        translatePage();
+    }
+
+    function updateSlide() {
+        if (!activeProject?.media?.length) return;
+        const item = activeProject.media[slideIndex];
+        byId('galleryStage').innerHTML = generateMediaSlide(item, language);
+        byId('galleryCaption').textContent = (language === 'ru' ? item.altRu || item.titleRu || item.labelRu : item.altEn || item.titleEn || item.label) || '';
+        byId('galleryCounter').textContent = `${String(slideIndex + 1).padStart(2, '0')} / ${String(activeProject.media.length).padStart(2, '0')}`;
+        byId('galleryThumbnails').querySelectorAll('[data-slide]').forEach(button => button.setAttribute('aria-pressed', String(Number(button.dataset.slide) === slideIndex)));
+    }
+
+    function changeSlide(index) {
+        if (!activeProject?.media?.length) return;
+        slideIndex = (index + activeProject.media.length) % activeProject.media.length;
+        updateSlide();
+    }
+
+    function renderDetail() {
+        byId('projectDetail').innerHTML = generateProjectDetail(activeProject, language);
+        updateSlide();
+    }
+
+    function openProject(id, opener) {
+        const project = projectsData.find(item => item.id === Number(id));
+        if (!project || (activeProject?.id === project.id && projectDialog.open)) return;
+        activeProject = project;
+        slideIndex = 0;
+        projectOpener = opener || document.activeElement;
+        setMenu(false);
+        renderDetail();
+        if (!projectDialog.open) projectDialog.showModal();
+        projectDialog.scrollTop = 0;
+        document.body.classList.add('modal-open');
+        byId('projectClose').focus({ preventScroll: true });
+    }
+
+    function closeImage() { if (imageDialog.open) imageDialog.close(); }
+    function closeProject() { closeImage(); if (projectDialog.open) projectDialog.close(); }
+
+    function openImage() {
+        const item = activeProject?.media?.[slideIndex];
+        if (!item || item.type !== 'image') return;
+        const label = (language === 'ru' ? item.altRu : item.altEn) || '';
+        byId('fullImage').src = item.src;
+        byId('fullImage').alt = label;
+        byId('fullImageCaption').textContent = label;
+        imageDialog.showModal();
+        byId('imageClose').focus();
+    }
+
+    function syncProjectHash() {
+        const match = window.location.hash.match(/^#project-(\d+)$/);
+        if (match) { closeImage(); openProject(match[1]); }
+        else closeProject();
+    }
+
+    document.addEventListener('click', event => {
+        const trigger = event.target.closest('[data-project]');
+        if (trigger) {
+            const id = trigger.dataset.project;
+            projectHash = window.location.hash && !window.location.hash.startsWith('#project-') ? window.location.hash : '#projects';
+            window.history.pushState(null, '', `#project-${id}`);
+            openProject(id, trigger);
+        }
+        if (!event.target.closest('.navigation')) setMenu(false);
+    });
+    byId('projectDetail').addEventListener('click', event => {
+        const thumbnail = event.target.closest('[data-slide]');
+        if (thumbnail) changeSlide(Number(thumbnail.dataset.slide));
+        if (event.target.closest('#galleryPrev')) changeSlide(slideIndex - 1);
+        if (event.target.closest('#galleryNext')) changeSlide(slideIndex + 1);
+        if (event.target.closest('[data-zoom]')) openImage();
+    });
+    byId('projectClose').addEventListener('click', closeProject);
+    byId('imageClose').addEventListener('click', closeImage);
+    byId('langToggle').addEventListener('click', toggleLanguage);
+    byId('projectLanguageToggle').addEventListener('click', toggleLanguage);
+    menuToggle.addEventListener('click', () => setMenu(!menu.classList.contains('active')));
+    menu.querySelectorAll('a').forEach(link => link.addEventListener('click', () => setMenu(false)));
+    search.addEventListener('input', updateProjects);
+    byId('clearSearch').addEventListener('click', () => { search.value = ''; updateProjects(); search.focus(); });
+
+    projectDialog.addEventListener('close', () => {
+        closeImage();
+        byId('projectDetail').replaceChildren(); // Unload embedded video/audio on close.
+        activeProject = null;
+        document.body.classList.remove('modal-open');
+        if (/^#project-\d+$/.test(window.location.hash)) window.history.replaceState(null, '', projectHash || '#projects');
+        if (projectOpener?.isConnected) projectOpener.focus({ preventScroll: true });
+        else document.querySelector('[data-project]')?.focus({ preventScroll: true });
+        projectOpener = null;
+    });
+    imageDialog.addEventListener('close', () => { byId('fullImage').removeAttribute('src'); });
+    [projectDialog, imageDialog].forEach(dialog => dialog.addEventListener('click', event => {
+        if (event.target !== dialog) return;
+        const rect = dialog.getBoundingClientRect();
+        if (event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom) dialog.close();
+    }));
+    document.addEventListener('keydown', event => {
+        if (event.key === 'Escape' && !projectDialog.open) setMenu(false);
+        if (!projectDialog.open || imageDialog.open || event.target.matches('input,textarea')) return;
+        if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
+            event.preventDefault();
+            changeSlide(slideIndex + (event.key === 'ArrowLeft' ? -1 : 1));
+        }
+    });
+    window.addEventListener('hashchange', syncProjectHash);
+    window.addEventListener('popstate', syncProjectHash);
+    window.matchMedia('(min-width: 641px)').addEventListener('change', event => { if (event.matches) setMenu(false); });
+    byId('footerYear').textContent = new Date().getFullYear();
+    translatePage();
+    syncProjectHash();
+})();
