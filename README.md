@@ -18,6 +18,7 @@ Then open `http://127.0.0.1:8000`. On macOS/Linux, use `python3` instead of `py 
 
 ## Content and interaction
 
+- The homepage introduces Almat with a color portrait, then covers his background before showing projects. Navigation follows the same order.
 - English and Russian, with the language choice saved locally.
 - Project search by title, description and technology.
 - Each project opens a native modal dialog with its description, technology stack, photo/video gallery and source links.
@@ -27,6 +28,8 @@ Then open `http://127.0.0.1:8000`. On macOS/Linux, use `python3` instead of `py 
 - Without a configured owner backend, the assistant provides clearly labelled answers from portfolio materials. Generated AI replies use a separate label and a server-maintained knowledge base.
 
 Edit project content in `projects-data.js`. Every project has a stable numeric `id`, `titleEn/Ru`, `descEn/Ru`, `categoryEn/Ru`, `subtitleEn/Ru`, `detailsEn/Ru: [{ title, text }]`, `tech`, `media` and optional `links`. Image media use `src` and `altEn/Ru`; YouTube items use `url` and `titleEn/Ru`. Optional `featured`, `cover`, `coverAltEn/Ru` and `contributionLabelEn/Ru` control a featured card. Static page copy is in paired `data-en` / `data-ru` attributes in `index.html`.
+
+The About section uses Almat's [public LinkedIn profile](https://kz.linkedin.com/in/almat-abdimalik/en), checked on 20 October 2026: KBTU education (2022–2026), Robotics Lab participation, the Siemens seminar (12–16 January 2026), ITFest mentoring/refereeing (5–6 December 2025), tools and languages. Employment titles or dates hidden by LinkedIn are not inferred. His PLC/SCADA/KUKA diploma contribution was separately confirmed by Almat.
 
 The diploma case study describes a team project and separately identifies Almat's work on PLC, SCADA and KUKA. Its gallery images in `media/diploma/` come from the [shared diploma repository](https://github.com/rassulz/multirobot_painting_control_system/tree/main/docs/images); author and source links appear in the project dialog. The diploma repository publishes its materials under the MIT license. Its source notice is preserved in `media/diploma/SOURCE-LICENSE.txt`.
 
